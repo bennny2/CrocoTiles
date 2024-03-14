@@ -1,18 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Hexagon : MonoBehaviour
-{
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+{   
+    //Properties
+    public Button HexagonButton {get => GetComponent<Button>(); set => HexagonButton = value;}
+    public Image HexagonImage {get => GetComponent<Image>(); set => HexagonImage = value;}
+
+    void Awake()
+    {   
+        HexagonButton.onClick.AddListener(() => ChangeColour());
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+    void ChangeColour(){
+        HexagonImage.color = Color.red;
     }
 }
