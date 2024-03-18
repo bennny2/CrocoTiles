@@ -52,7 +52,7 @@ public class Hexagon : MonoBehaviour
     // Class Methods
     void Awake() {
         InitilizeComponents();
-        //hexagonButton.onClick.AddListener(() => boardObject.HexagonPressed(this));
+        hexagonButton.onClick.AddListener(() => boardObject.HexagonPressed(this));
     }
 
     void InitilizeComponents() {
@@ -103,7 +103,7 @@ public class Hexagon : MonoBehaviour
     }
 
     public void SetLetter(){
-        //HexagonText.text = Letter.GenerateLetter();
+        HexagonText.text = Letter.GenerateLetter();
     }
 
     public void SetHexagonState(HexagonStates state) {
@@ -117,7 +117,7 @@ public class Hexagon : MonoBehaviour
 
             case "neutral":
                 if (string.IsNullOrWhiteSpace(HexagonText.text)) { 
-                    //HexagonText.text = Letter.GenerateLetter();
+                    HexagonText.text = Letter.GenerateLetter();
                 }
                 break;
 
