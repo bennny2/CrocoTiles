@@ -113,4 +113,48 @@ public class Board : MonoBehaviour
     public HexagonStates TerritoryTeam1 => territoryTeam1;
     public HexagonStates TerritoryTeam2 => territoryTeam2;
 
+    // Class Methods
+
+    void Awake() {
+        InitializeHexagonsOnBoard(); 
+        //InitilizeComponents();
+    }
+
+
+    private void InitializeHexagonsOnBoard() {
+        float boardCols = PlayerPrefs.GetInt("BoardCols", 7);
+        float boardRows = PlayerPrefs.GetInt("BoardRows", 9);
+
+        float x = 0;
+        float y = 0;
+
+        for (int i = 0; i < boardRows; i++) {
+            if (i % 2 == 0) {
+                //create short row
+                for (int k = 1; k <= (int)Math.Floor((double)boardCols / 2); k++) {
+                    x = k * Hexagon.HORIZONTALOFFSET * 2;
+                    y = i * Hexagon.VERTICALOFFSET / 2;
+                    Vector3 position = new(x - 350, y - 200);
+                    CreateHexagon(position);
+                }
+            } else {
+                //create long row
+                for (int k = 1; k <= (int)Math.Ceiling((double)boardCols / 2); k++) {
+                    x = k * Hexagon.HORIZONTALOFFSET * 2 - Hexagon.HORIZONTALOFFSET;
+                    y = i * (Hexagon.VERTICALOFFSET / 2);
+                    Vector3 position = new(x - 350, y - 200);
+                    CreateHexagon(position);
+                }
+            }
+        }    
+    }
+
+    private void CreateHexagon(Vector3 position) {
+        GameObject newHexagonObject = Instantiate(hexagonPrefab, boardTransform);
+        newHexagonObject.transform.SetLocalPositionAndRotation(position, Quaternion.identity);
+        Hexagon newHexagon = newHexagonObject.GetComponent<Hexagon>();
+        newHexagon.HexagonX = position.x;
+        newHexagon.HexagonY = position.y;
+    }
+
 }
