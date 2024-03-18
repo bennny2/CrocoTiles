@@ -51,11 +51,7 @@ public class Board : MonoBehaviour
     [SerializeField]
     private Transform boardTransform;
     [SerializeField]
-    
-    
-    //private CurrentWord currentWordObjectOnScreen; 
-
-
+    private CurrentWord currentWordObjectOnScreen; 
     // Fields
     private TextMeshProUGUI winnerBlockText;
     private List<Hexagon> allHexagons;
@@ -80,13 +76,13 @@ public class Board : MonoBehaviour
         set => bonusTurnActive = value;
     }
 
-    /*
+    
     public CurrentWord CurrentWordObjectOnScreen
     {
         get => currentWordObjectOnScreen;
         set => currentWordObjectOnScreen = value;
     }
-    */
+    
 
     public List<string> ListOfLettersPressed 
     {
@@ -222,7 +218,7 @@ public class Board : MonoBehaviour
     private void InitilizeComponents() {
         AllHexagons = GetComponentsInChildren<Hexagon>().ToList();
         //spellCheck = new SpellCheck();
-        InitializeWinnerBlock();
+        //InitializeWinnerBlock();
     }
 
     private void InitializeWinnerBlock() {
@@ -330,12 +326,12 @@ public class Board : MonoBehaviour
     public void HexagonPressed(Hexagon hex) {
         string hexState = hex.HexagonCurrentState;
         if (hexState == "neutral") {
-            audioPressed.Play();
+            //audioPressed.Play();
             CurrentWordUpdate(hex.HexagonText.text);
             hex.SetHexagonState(GetCurrentTeam());
 
         } else if (hexState == "pressedTeam1" || hexState == "pressedTeam2") {
-            audioUnPressed.Play();
+            //audioUnPressed.Play();
             CurrentWordRemove(hex.HexagonText.text);
             hex.SetHexagonState(Neutral);
 
@@ -410,13 +406,13 @@ public class Board : MonoBehaviour
         CheckBoardIsPlayable();
         CheckHomesAreSet();
         CheckBonusTurn();
-        audioWordSubmit.Play();
+        //audioWordSubmit.Play();
     }
 
     private void ProcessInvalidWord() {
         ClearPressedHexagonsInvaildWord();
         ResetWordState();
-        audioWordFailed.Play();
+        //audioWordFailed.Play();
     }
 
     private void ProcessHexagonTerritory(Hexagon hex, string team) {
@@ -455,14 +451,14 @@ public class Board : MonoBehaviour
     private void SetHomeBases() {
 
         //the math only works if there are two more rows than columns in the board eg. 7 cols and 9 rows
-        int boardCols = PlayerPrefs.GetInt("BoardCols");
+        int boardCols = PlayerPrefs.GetInt("BoardCols", 7);
         int base1, base2;
 
         int halfBoardColsRoundedUp = (int)Math.Ceiling((double)boardCols / 2);
         int halfBoardColsRoundedDown = (int)Math.Floor((double)boardCols / 2);
         int totalHexes = halfBoardColsRoundedUp * halfBoardColsRoundedUp * 2;
 
-        SetCameraZoom(totalHexes);
+        //SetCameraZoom(totalHexes);
 
         base1 = boardCols + halfBoardColsRoundedDown;
         base2 = totalHexes - base1;
@@ -536,7 +532,7 @@ public class Board : MonoBehaviour
         } else {
             winnerBlockText.text = "Team 2 has Won!";
         }
-        audioVictory.Play();
+        //audioVictory.Play();
         winnerBlock.SetActive(true);
         playAgainButton.gameObject.SetActive(true);
         quitButton.gameObject.SetActive(true);
