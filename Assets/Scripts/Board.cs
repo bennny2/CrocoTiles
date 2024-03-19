@@ -124,8 +124,8 @@ public class Board : MonoBehaviour
 
 
     private void InitializeHexagonsOnBoard() {
-        float boardCols = PlayerPrefs.GetInt("BoardCols", 7);
-        float boardRows = PlayerPrefs.GetInt("BoardRows", 9);
+        float boardCols = PlayerPrefs.GetInt("BoardCols", 11);
+        float boardRows = PlayerPrefs.GetInt("BoardRows", 13);
 
         float x = 0;
         float y = 0;
@@ -451,14 +451,14 @@ public class Board : MonoBehaviour
     private void SetHomeBases() {
 
         //the math only works if there are two more rows than columns in the board eg. 7 cols and 9 rows
-        int boardCols = PlayerPrefs.GetInt("BoardCols", 7);
+        int boardCols = PlayerPrefs.GetInt("BoardCols", 11);
         int base1, base2;
 
         int halfBoardColsRoundedUp = (int)Math.Ceiling((double)boardCols / 2);
         int halfBoardColsRoundedDown = (int)Math.Floor((double)boardCols / 2);
         int totalHexes = halfBoardColsRoundedUp * halfBoardColsRoundedUp * 2;
 
-        //SetCameraZoom(totalHexes);
+        SetCameraZoom(totalHexes);
 
         base1 = boardCols + halfBoardColsRoundedDown;
         base2 = totalHexes - base1;
@@ -469,11 +469,17 @@ public class Board : MonoBehaviour
 
     private void SetCameraZoom(int totalHexes) {
         int middleHex = totalHexes / 2;
-        Vector3 middleHexCoords = new(AllHexagons[middleHex - 1].HexagonX, AllHexagons[middleHex - 1].HexagonY);
-        float camSize = (float)(230 + ((totalHexes + 10) * 2.4));
+
+        float newX = (float)((float)AllHexagons[middleHex - 1].HexagonY + 39.5);
+
+        float offsetX = 69.35f;
+        float offsetY = 39.63f;
+        Vector3 middleHexCoords = new Vector3(AllHexagons[middleHex - 1].HexagonX + offsetX, AllHexagons[middleHex - 1].HexagonY + offsetY);
+
+        float camSize = (float)(totalHexes / 11.27);
 
         Camera.main.orthographicSize = camSize;
-        Camera.main.transform.Translate(middleHexCoords);
+        //Camera.main.transform.Translate(middleHexCoords);
     }
 
     public void SubmitButtonPressed() {
