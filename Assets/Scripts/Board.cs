@@ -124,8 +124,8 @@ public class Board : MonoBehaviour
 
 
     private void InitializeHexagonsOnBoard() {
-        float boardCols = PlayerPrefs.GetInt("BoardCols", 11);
-        float boardRows = PlayerPrefs.GetInt("BoardRows", 13);
+        float boardCols = PlayerPrefs.GetInt("BoardCols", 7);
+        float boardRows = PlayerPrefs.GetInt("BoardRows", 9);
 
         float x = 0;
         float y = 0;
@@ -349,8 +349,9 @@ public class Board : MonoBehaviour
     }
 
     public void LoadMainMenu() {
-        chooseSettingsNoise.Play();
-        StartCoroutine(LoadSceneCoroutine("Main Menu Scene"));
+        //chooseSettingsNoise.Play();
+        //StartCoroutine(LoadSceneCoroutine("MainMenuScene"));
+        SceneManager.LoadScene("MainMenuScene");
     }
 
     private IEnumerator LoadSceneCoroutine(string scene) {
@@ -451,14 +452,14 @@ public class Board : MonoBehaviour
     private void SetHomeBases() {
 
         //the math only works if there are two more rows than columns in the board eg. 7 cols and 9 rows
-        int boardCols = PlayerPrefs.GetInt("BoardCols", 11);
+        int boardCols = PlayerPrefs.GetInt("BoardCols", 7);
         int base1, base2;
 
         int halfBoardColsRoundedUp = (int)Math.Ceiling((double)boardCols / 2);
         int halfBoardColsRoundedDown = (int)Math.Floor((double)boardCols / 2);
         int totalHexes = halfBoardColsRoundedUp * halfBoardColsRoundedUp * 2;
 
-        SetCameraZoom(totalHexes);
+        SetCameraZoom(boardCols);
 
         base1 = boardCols + halfBoardColsRoundedDown;
         base2 = totalHexes - base1;
@@ -467,19 +468,31 @@ public class Board : MonoBehaviour
         AllHexagons[base2 - 1].SetHexagonState(HomeTeam2);
     }
 
-    private void SetCameraZoom(int totalHexes) {
-        int middleHex = totalHexes / 2;
+    private void SetCameraZoom(int boardCols) {
 
-        float newX = (float)((float)AllHexagons[middleHex - 1].HexagonY + 39.5);
+        float camSize = 2.4f;
+        Vector3 camMove = new(-0.65f, -0.35f);
 
-        float offsetX = 69.35f;
-        float offsetY = 39.63f;
-        Vector3 middleHexCoords = new Vector3(AllHexagons[middleHex - 1].HexagonX + offsetX, AllHexagons[middleHex - 1].HexagonY + offsetY);
-
-        float camSize = (float)(totalHexes / 11.27);
+        switch (boardCols)
+        {
+            case 7:
+                camSize = 2.4f;
+                camMove = new(-0.65f, -0.35f);
+                break;
+            case 9:
+                camSize = 2.7f;
+                camMove = new(0f, 0f);
+                break;
+            case 11:
+                camSize = 3f;
+                camMove = new(0.65f, 0.35f);
+                break;
+            default:
+                break;
+        }
 
         Camera.main.orthographicSize = camSize;
-        //Camera.main.transform.Translate(middleHexCoords);
+        Camera.main.transform.Translate(camMove);
     }
 
     public void SubmitButtonPressed() {
