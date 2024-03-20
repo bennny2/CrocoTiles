@@ -390,6 +390,7 @@ MonoBehaviour:
   hexagonPrefab: {fileID: 3937737225052901753, guid: b6ccbbfcb0a28c544b9d2322c1603e46, type: 3}
   boardTransform: {fileID: 576466920}
   currentWordObjectOnScreen: {fileID: 352126768}
+  winnerBlockText: {fileID: 1838990286}
 --- !u!1 &699584921
 GameObject:
   m_ObjectHideFlags: 0

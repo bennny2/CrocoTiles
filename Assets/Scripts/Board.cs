@@ -51,10 +51,11 @@ public class Board : MonoBehaviour
     [SerializeField]
     private Transform boardTransform;
     [SerializeField]
-    private CurrentWord currentWordObjectOnScreen; 
-    
-    // Fields
+    private CurrentWord currentWordObjectOnScreen;
+    [SerializeField]
     private TextMeshProUGUI winnerBlockText;
+
+    // Fields
     private List<Hexagon> allHexagons;
     private bool bonusTurnActive;    
     private List<string> listOfLettersPressed = new();
@@ -121,6 +122,7 @@ public class Board : MonoBehaviour
         InitializeColors();
         MakeAllHexagonsInvisible();
         SetHomeBases();
+        SetCameraZoom();
     }
 
 
@@ -223,7 +225,6 @@ public class Board : MonoBehaviour
     }
 
     private void InitializeWinnerBlock() {
-        winnerBlockText = winnerBlock.GetComponentInChildren<TextMeshProUGUI>();
         RectTransform winnerBlockRect = winnerBlock.GetComponent<RectTransform>();
         winnerBlockRect.SetAsLastSibling();
     }
@@ -460,8 +461,6 @@ public class Board : MonoBehaviour
         int halfBoardColsRoundedDown = (int)Math.Floor((double)boardCols / 2);
         int totalHexes = halfBoardColsRoundedUp * halfBoardColsRoundedUp * 2;
 
-        SetCameraZoom(boardCols);
-
         base1 = boardCols + halfBoardColsRoundedDown;
         base2 = totalHexes - base1;
 
@@ -469,13 +468,13 @@ public class Board : MonoBehaviour
         AllHexagons[base2 - 1].SetHexagonState(HomeTeam2);
     }
 
-    private void SetCameraZoom(int boardCols) {
-
+    private void SetCameraZoom() {
+        
+        float boardCols = PlayerPrefs.GetInt("BoardCols", 7);
         float camSize = 2.4f;
         Vector3 camMove = new(-0.65f, -0.35f);
 
-        switch (boardCols)
-        {
+        switch (boardCols) {
             case 7:
                 camSize = 2.4f;
                 camMove = new(-0.65f, -0.35f);
@@ -487,8 +486,6 @@ public class Board : MonoBehaviour
             case 11:
                 camSize = 3f;
                 camMove = new(0.65f, 0.35f);
-                break;
-            default:
                 break;
         }
 
