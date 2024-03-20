@@ -52,6 +52,7 @@ public class Board : MonoBehaviour
     private Transform boardTransform;
     [SerializeField]
     private CurrentWord currentWordObjectOnScreen; 
+    
     // Fields
     private TextMeshProUGUI winnerBlockText;
     private List<Hexagon> allHexagons;
@@ -218,11 +219,11 @@ public class Board : MonoBehaviour
     private void InitilizeComponents() {
         AllHexagons = GetComponentsInChildren<Hexagon>().ToList();
         //spellCheck = new SpellCheck();
-        //InitializeWinnerBlock();
+        InitializeWinnerBlock();
     }
 
     private void InitializeWinnerBlock() {
-        winnerBlockText = transform.Find("Winner Block").GetComponentInChildren<TextMeshProUGUI>();
+        winnerBlockText = winnerBlock.GetComponentInChildren<TextMeshProUGUI>();
         RectTransform winnerBlockRect = winnerBlock.GetComponent<RectTransform>();
         winnerBlockRect.SetAsLastSibling();
     }
