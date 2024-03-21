@@ -17,6 +17,7 @@ public class MainMenuBoard : MonoBehaviour {
     public void LoadSettingsScene() {
         //buttonSound.Play();
         //StartCoroutine(LoadSceneCoroutine("SettingsScene"));
+        SceneManager.LoadScene("SettingsScene");
     }
 
     private IEnumerator LoadSceneCoroutine(string scene) {
