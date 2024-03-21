@@ -65,7 +65,7 @@ public class SettingsBoard : MonoBehaviour
 
     public void ApplySettings() {
         SaveColour();
-        //applySettingsNoise.Play();
+        applySettingsNoise.Play();
     }
 
     public void SmallBoard() {
