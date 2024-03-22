@@ -11,6 +11,8 @@ public class SettingsBoard : MonoBehaviour
     [SerializeField]
     private AudioSource chooseSettingsNoise;
     [SerializeField]
+    private AudioSource mainMenuNoise;
+    [SerializeField]
     private Image colorResultTeam1;
     [SerializeField]
     private Image colorResultTeam2;
@@ -58,9 +60,8 @@ public class SettingsBoard : MonoBehaviour
     }
     
     public void LoadMenuScene() {
-        //chooseSettingsNoise.Play();
-        //StartCoroutine(LoadSceneCoroutine("MainMenuScene"));
-        SceneManager.LoadScene("MainMenuScene");
+        mainMenuNoise.Play();
+        StartCoroutine(LoadSceneCoroutine("MainMenuScene"));
     } 
 
     public void ApplySettings() {
@@ -71,23 +72,23 @@ public class SettingsBoard : MonoBehaviour
     public void SmallBoard() {
         PlayerPrefs.SetInt("BoardCols", 7);
         PlayerPrefs.SetInt("BoardRows", 9);
-        //chooseSettingsNoise.Play();
+        chooseSettingsNoise.Play();
     }
 
     public void MediumBoard() {
         PlayerPrefs.SetInt("BoardCols", 9);
         PlayerPrefs.SetInt("BoardRows", 11);
-        //chooseSettingsNoise.Play();
+        chooseSettingsNoise.Play();
     }
 
     public void LargeBoard() {
         PlayerPrefs.SetInt("BoardCols", 11);
         PlayerPrefs.SetInt("BoardRows", 13);
-        //chooseSettingsNoise.Play();
+        chooseSettingsNoise.Play();
     }
 
     private IEnumerator LoadSceneCoroutine(string scene) {
-        yield return new WaitWhile(() => chooseSettingsNoise.isPlaying);
+        yield return new WaitWhile(() => mainMenuNoise.isPlaying);
         SceneManager.LoadScene(scene);
     }
 }

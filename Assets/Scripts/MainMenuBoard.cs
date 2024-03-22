@@ -9,15 +9,15 @@ public class MainMenuBoard : MonoBehaviour {
 
     // Class Methods
     public void LoadGameScene() {
-        //buttonSound.Play();
-        //StartCoroutine(LoadSceneCoroutine("GameScene"));
-        SceneManager.LoadScene("GameScene");
+        buttonSound.Play();
+        StartCoroutine(LoadSceneCoroutine("GameScene"));
+        
     }
 
     public void LoadSettingsScene() {
-        //buttonSound.Play();
-        //StartCoroutine(LoadSceneCoroutine("SettingsScene"));
-        SceneManager.LoadScene("SettingsScene");
+        buttonSound.Play();
+        StartCoroutine(LoadSceneCoroutine("SettingsScene"));
+        
     }
 
     private IEnumerator LoadSceneCoroutine(string scene) {
