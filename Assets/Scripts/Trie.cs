@@ -19,7 +19,7 @@ class Trie
     public Trie()
     {
         root = new TrieNode();
-        foreach (string word in File.ReadAllLines("C:/Users/benhu/Documents/GitHub/TileWar/TileWarNew/Assets/Dictionary/collins.dic"))
+        foreach (string word in File.ReadAllLines(Application.dataPath + "/Dictionary/collins.dic"))
             Insert(word.ToLower());
     }
 
