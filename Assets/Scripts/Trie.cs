@@ -18,6 +18,8 @@ class Trie
     public Trie()
     {
         root = new TrieNode();
+        foreach (string word in File.ReadAllLines("C:/Users/benhu/Documents/GitHub/TileWar/TileWarNew/Assets/Dictionary/collins.dic"))
+            Insert(word.ToLower());
     }
 
     public void Insert(string word)

@@ -489,11 +489,8 @@ public class Board : MonoBehaviour
     }
 
     public void SubmitButtonPressed() {
-    
-        foreach (string word in File.ReadAllLines("C:/Users/benhu/Documents/GitHub/TileWar/TileWarNew/Assets/Dictionary/collins.dic"))
-            trie.Insert(word);
 
-        if (trie.Search(CurrentWordObjectOnScreen.CurrentWordText.text))
+        if (trie.Search(CurrentWordObjectOnScreen.CurrentWordText.text.ToLower()))
         {
             ProcessValidWord();
         }
