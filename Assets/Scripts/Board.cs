@@ -6,6 +6,7 @@ using System;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using System.IO;
 
 public class Board : MonoBehaviour
 {
@@ -59,9 +60,7 @@ public class Board : MonoBehaviour
     private List<Hexagon> allHexagons;
     private bool bonusTurnActive;    
     private List<string> listOfLettersPressed = new();
-
-
-    //private SpellCheck spellCheck = new();
+    private Trie trie = new();
 
 
     private bool team1Turn = true;
@@ -91,10 +90,7 @@ public class Board : MonoBehaviour
         get => listOfLettersPressed;
         set => listOfLettersPressed = value;
     }
-
-    /*
-    public SpellCheck SpellCheck => spellCheck; 
-    */
+    
     public bool Team1Turn
     {
         get => team1Turn;
@@ -493,9 +489,11 @@ public class Board : MonoBehaviour
     }
 
     public void SubmitButtonPressed() {
-        bool isValidWord = true; //spellCheck.IsValidWord(CurrentWordObjectOnScreen.CurrentWordText.text);
+    
+        foreach (string word in File.ReadAllLines("C:/Users/benhu/Documents/GitHub/TileWar/TileWarNew/Assets/Dictionary/collins.dic"))
+            trie.Insert(word);
 
-        if (isValidWord)
+        if (trie.Search(CurrentWordObjectOnScreen.CurrentWordText.text))
         {
             ProcessValidWord();
         }
