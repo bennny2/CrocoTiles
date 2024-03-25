@@ -216,7 +216,6 @@ public class Board : MonoBehaviour
 
     private void InitilizeComponents() {
         AllHexagons = GetComponentsInChildren<Hexagon>().ToList();
-        //spellCheck = new SpellCheck();
         InitializeWinnerBlock();
     }
 
@@ -304,9 +303,9 @@ public class Board : MonoBehaviour
     }
 
     private void CheckBoardIsPlayable() {
-        //if (!SpellCheck.CanFormValidWord(AllHexagons)) {
-        //    ShuffleLetters();
-        //}
+        if (!trie.CanFormValidWord(AllHexagons)) {
+            ShuffleLetters();
+        }
     }
 
     private HexagonStates GetCurrentTeam() {

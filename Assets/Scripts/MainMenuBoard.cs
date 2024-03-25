@@ -24,5 +24,15 @@ public class MainMenuBoard : MonoBehaviour {
         yield return new WaitWhile(() => buttonSound.isPlaying);
         SceneManager.LoadScene(scene);
     }
+
+    public void ExitGame()
+    {
+        // Code to exit the game
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+        #else
+            Application.Quit();
+        #endif
+    }
 }
 

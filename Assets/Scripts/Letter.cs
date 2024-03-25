@@ -53,7 +53,7 @@ public static class Letter
     }
 
     public static string GenerateLetter() {
-        char newLetter = Letters[random.Next(0, Letters.Count)];
+        char newLetter = Letters[random.Next(0, Letters.Count-1)];
         DeleteLetterFromList(newLetter);
         return newLetter.ToString();
     }

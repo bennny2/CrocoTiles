@@ -630,7 +630,7 @@ PlayerSettings:
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
   metroPackageName: TileWarNew
-  metroPackageVersion: 
+  metroPackageVersion: 1.0.0.0
   metroCertificatePath: Assets/WSATestCertificate.pfx
   metroCertificatePassword: 
   metroCertificateSubject: DefaultCompany
@@ -638,7 +638,7 @@ PlayerSettings:
   metroCertificateNotAfter: 807e6194839bdb01
   metroApplicationDescription: TileWarNew
   wsaImages: {}
-  metroTileShortName: 
+  metroTileShortName: TileWarNew
   metroTileShowName: 0
   metroMediumTileShowName: 0
   metroLargeTileShowName: 0
