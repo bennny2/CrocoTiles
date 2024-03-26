@@ -119,8 +119,20 @@ public class Board : MonoBehaviour
         MakeAllHexagonsInvisible();
         SetHomeBases();
         SetCameraZoom();
+        LoadDictionary();
     }
 
+    private void LoadDictionary() {
+        TextAsset[] dictionaries = Resources.LoadAll<TextAsset>("collins");
+        foreach (TextAsset dictionary in dictionaries)
+        {
+            string[] words = dictionary.text.Split('\n');
+            foreach (string word in words)
+            {
+                trie.Insert(word.ToLower().Trim());
+            }
+        }
+    }
 
     private void InitializeHexagonsOnBoard() {
         float boardCols = PlayerPrefs.GetInt("BoardCols", 7);

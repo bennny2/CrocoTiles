@@ -5,12 +5,23 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-// Trie node
 class TrieNode
 {
-    public TrieNode[] Children = new TrieNode[26];
-    public bool IsEndOfWord;
+    public TrieNode[] Children { get; } = new TrieNode[26]; // Initialize the array with 26 elements
+
+    public bool IsEndOfWord { get; set; }
+
+    // Constructor
+    public TrieNode()
+    {
+        // Initialize all elements of the Children array to null
+        for (int i = 0; i < Children.Length; i++)
+        {
+            Children[i] = null;
+        }
+    }
 }
+
 
 class Trie
 {
@@ -19,8 +30,6 @@ class Trie
     public Trie()
     {
         root = new TrieNode();
-        foreach (string word in File.ReadAllLines(Application.dataPath + "/Dictionary/collins.dic"))
-            Insert(word.ToLower());
     }
 
     public void Insert(string word)
@@ -54,6 +63,7 @@ class Trie
         }
         return node;
     }
+    
     private bool CanTheseLettersMakeAWord(List<string> letters) {
         IEnumerable<string> letterEnumerable = letters;
 
