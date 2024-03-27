@@ -120,6 +120,7 @@ public class Board : MonoBehaviour
         SetHomeBases();
         SetCameraZoom();
         LoadDictionary();
+        ProcessGlowingHexagons();
     }
 
     private void LoadDictionary() {
@@ -416,6 +417,7 @@ public class Board : MonoBehaviour
         CheckHomesAreSet();
         CheckBonusTurn();
         audioWordSubmit.Play();
+        ProcessGlowingHexagons();
     }
 
     private void ProcessInvalidWord() {
@@ -423,6 +425,25 @@ public class Board : MonoBehaviour
         ResetWordState();
         audioWordFailed.Play();
     }
+
+    void ProcessGlowingHexagons() {
+        foreach (Hexagon hex in AllHexagons)
+        {
+            bool isTeam1Hex = hex.HexagonCurrentState == "territoryTeam1" || hex.HexagonCurrentState == "homeTeam1";
+            bool isTeam2Hex = hex.HexagonCurrentState == "territoryTeam2" || hex.HexagonCurrentState == "homeTeam2";
+            bool shouldGlow = (Team1Turn && isTeam1Hex) || (!Team1Turn && isTeam2Hex);
+            
+            if (hex.HexagonImage.material == null || hex.HexagonImage.material.shader.name != "Custom/GlowPulseShader")
+                {
+                    hex.HexagonImage.material = new Material(Shader.Find("Custom/GlowPulseShader"));
+                }
+    
+
+            //hex.HexagonImage.material.SetFloat("_GlowStrength", shouldGlow ? 2.0f : 0.0f);
+            //hex.HexagonImage.material.SetFloat("_PulseSpeed", shouldGlow ? 3.0f : 0.0f); 
+        }
+    }
+
 
     private void ProcessHexagonTerritory(Hexagon hex, string team) {
         List<Hexagon> touchingHexes = hex.FindTouchingHexagons();
