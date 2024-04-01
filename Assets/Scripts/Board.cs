@@ -348,6 +348,7 @@ public class Board : MonoBehaviour
         } else {
             //if state is home/territory/invisible then do nothing
         }
+        ProcessGlowingHexagons();
     }
 
     private bool IsHexagonPressed(Hexagon hex) {
@@ -434,15 +435,16 @@ public class Board : MonoBehaviour
             bool shouldGlow = (Team1Turn && isTeam1Hex) || (!Team1Turn && isTeam2Hex);
             
             if (hex.HexagonImage.material == null || hex.HexagonImage.material.shader.name != "Custom/GlowPulseShader")
-                {
-                    hex.HexagonImage.material = new Material(Shader.Find("Custom/GlowPulseShader"));
-                }
-    
+            {
+                hex.HexagonImage.material = new Material(Shader.Find("Custom/GlowPulseShader"));
+            }
 
-            hex.HexagonImage.material.SetFloat("_GlowStrength", shouldGlow ? 2.0f : 0.0f);
-            hex.HexagonImage.material.SetFloat("_PulseSpeed", shouldGlow ? 3.0f : 0.0f); 
+            hex.HexagonImage.material.color = hex.HexagonImage.color;
+            hex.HexagonImage.material.SetFloat("_GlowStrength", shouldGlow ? 1.0f : 0.0f); // Adjust glow strength
+            hex.HexagonImage.material.SetFloat("_PulseSpeed", shouldGlow ? 1.0f : 0.0f); 
         }
     }
+
 
 
     private void ProcessHexagonTerritory(Hexagon hex, string team) {
