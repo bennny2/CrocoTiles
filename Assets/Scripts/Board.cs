@@ -178,6 +178,7 @@ public class Board : MonoBehaviour
         ClearLetters();
         MakeAllHexagonsInvisible();
         SetHomeBases();
+        ProcessGlowingHexagons();
     }
 
     private void ClearLetters() {
@@ -274,7 +275,7 @@ public class Board : MonoBehaviour
         hex.SetHexagonState(Neutral);
     }
 
-    private void ClearPressedHexagonsInvaildWord() {
+    public void ClearPressedHexagonsInvaildWord() {
         foreach (Hexagon hex in allHexagons)
         {
             if (IsHexagonPressed(hex))
@@ -427,7 +428,7 @@ public class Board : MonoBehaviour
         audioWordFailed.Play();
     }
 
-    void ProcessGlowingHexagons() {
+    public void ProcessGlowingHexagons() {
         foreach (Hexagon hex in AllHexagons)
         {
             bool isTeam1Hex = hex.HexagonCurrentState == "territoryTeam1" || hex.HexagonCurrentState == "homeTeam1";
@@ -441,11 +442,9 @@ public class Board : MonoBehaviour
 
             hex.HexagonImage.material.color = hex.HexagonImage.color;
             hex.HexagonImage.material.SetFloat("_GlowStrength", shouldGlow ? 1.0f : 0.0f); 
-            hex.HexagonImage.material.SetFloat("_PulseSpeed", shouldGlow ? 5.0f : 0.0f); 
+            hex.HexagonImage.material.SetFloat("_PulseSpeed", shouldGlow ? 3.0f : 0.0f); 
         }
     }
-
-
 
     private void ProcessHexagonTerritory(Hexagon hex, string team) {
         List<Hexagon> touchingHexes = hex.FindTouchingHexagons();
@@ -475,7 +474,7 @@ public class Board : MonoBehaviour
         MakePressedHexagonsTerritory(touchingHex);
     }
 
-    private void ResetWordState() {
+    public void ResetWordState() {
         CurrentWordObjectOnScreen.UpdateCurrentWord("");
         ListOfLettersPressed.Clear();
     }
