@@ -22,13 +22,13 @@ Shader "Custom/GlowPulseShader"
         struct Input
         {
             float2 _Color;
-        };
+        }; //useless but error if not here
 
         void surf(Input IN, inout SurfaceOutput o)
         {
             fixed4 c = _Color;
-            o.Albedo = c.rgb * (_GlowStrength + 0.5) * (sin(_Time.y * _PulseSpeed) * 200.5 + 0.5);
-            o.Alpha = c.a + 10;
+            o.Albedo = c.rgb * (_GlowStrength + 0.5) * (sin(_Time.y * _PulseSpeed) * 35 + 50); //last number is sine wave offset, second to last is wave amplitude, glow affect and timing works off sine wave goes between 1 and -1
+            o.Alpha = c.a;
         }
         ENDCG
     }

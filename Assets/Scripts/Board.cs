@@ -440,8 +440,8 @@ public class Board : MonoBehaviour
             }
 
             hex.HexagonImage.material.color = hex.HexagonImage.color;
-            hex.HexagonImage.material.SetFloat("_GlowStrength", shouldGlow ? 1.0f : 0.0f); // Adjust glow strength
-            hex.HexagonImage.material.SetFloat("_PulseSpeed", shouldGlow ? 1.0f : 0.0f); 
+            hex.HexagonImage.material.SetFloat("_GlowStrength", shouldGlow ? 1.0f : 0.0f); 
+            hex.HexagonImage.material.SetFloat("_PulseSpeed", shouldGlow ? 5.0f : 0.0f); 
         }
     }
 
