@@ -31,6 +31,8 @@ public class Board : MonoBehaviour
 
     // Serialized Fields
     [SerializeField]
+    private AudioSource audioClearWord;
+    [SerializeField]
     private AudioSource audioPressed;
     [SerializeField]
     private AudioSource audioUnPressed;
@@ -619,6 +621,20 @@ public class Board : MonoBehaviour
         ChangeTurn();
     }
 
+    public void ClearWord() {
+        if (!string.IsNullOrWhiteSpace(CurrentWordObjectOnScreen.CurrentWordText.text)) {
+            ResetWordState();
+            audioClearWord.Play();
+            ClearPressedHexagonsInvaildWord();
+            ProcessGlowingHexagons();
+        }
+    }
+
+    void Update() {
+        if (Input.GetMouseButtonDown(1)) {
+            ClearWord();
+        }
+    }
 }
 
 
