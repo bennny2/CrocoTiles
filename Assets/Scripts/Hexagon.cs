@@ -111,7 +111,7 @@ public class Hexagon : MonoBehaviour
         {
             case "homeTeam1":
             case "homeTeam2":
-                HexagonText.text = "*";
+                HexagonText.text = "";
                 MakeTouchingHexagonsNeutralAroundHome();
                 break;
 

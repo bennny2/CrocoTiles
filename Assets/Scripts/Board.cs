@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using System.IO;
+using Unity.VisualScripting;
 
 public class Board : MonoBehaviour
 {
@@ -55,6 +56,12 @@ public class Board : MonoBehaviour
     private CurrentWord currentWordObjectOnScreen;
     [SerializeField]
     private TextMeshProUGUI winnerBlockText;
+    [SerializeField]
+    private GameObject team1Icon;
+    [SerializeField]
+    private GameObject team2Icon;
+    [SerializeField]
+    private GameObject bonusReminder;
 
     // Fields
     private List<Hexagon> allHexagons;
@@ -179,6 +186,7 @@ public class Board : MonoBehaviour
         MakeAllHexagonsInvisible();
         SetHomeBases();
         ProcessGlowingHexagons();
+        Team1Turn = true;
     }
 
     private void ClearLetters() {
@@ -198,7 +206,7 @@ public class Board : MonoBehaviour
         {
             string colorString = "#" + PlayerPrefs.GetString(key);
 
-            if (ColorUtility.TryParseHtmlString(colorString, out Color parsedColor))
+            if (UnityEngine.ColorUtility.TryParseHtmlString(colorString, out Color parsedColor))
             {
                 switch (key)
                 {
@@ -398,6 +406,14 @@ public class Board : MonoBehaviour
 
                 if (IsHomeState(hexState))
                 {
+                    //disable icon for the opposite team
+                    if (team1Turn) {
+                        team2Icon.SetActive(false);
+                    } else {
+                        team1Icon.SetActive(false);
+                    }
+
+                    bonusReminder.SetActive(true);
                     BonusTurnActive = true;
                     touchingHexagon.SetLetter();
                     SetNewHome(GetOpponentHomeState(hexState));
@@ -494,6 +510,12 @@ public class Board : MonoBehaviour
 
         AllHexagons[base1 - 1].SetHexagonState(HomeTeam1);
         AllHexagons[base2 - 1].SetHexagonState(HomeTeam2);
+
+        team1Icon.SetActive(true);
+        team2Icon.SetActive(true);
+
+        team1Icon.transform.position = new Vector2(AllHexagons[base1 - 1].HexagonX / 108f, AllHexagons[base1 - 1].HexagonY / 108f);
+        team2Icon.transform.position = new Vector2(AllHexagons[base2 - 1].HexagonX / 108f, AllHexagons[base2 - 1].HexagonY / 108f);
     }
 
     private void SetCameraZoom() {
@@ -554,11 +576,24 @@ public class Board : MonoBehaviour
     private void SetNewHome(string team) {
         Hexagon hex = SelectRandomHexagonOfType($"territory{team[4..]}");
         if (hex != null && !BonusTurnActive) {
-            ChangeTurn();
-            hex.SetHexagonState(team == "homeTeam2" ? HomeTeam2 : HomeTeam1);
-            ChangeTurn(); // Changing turn before and after so that when the new home is set, it's that player's turn, so their home doesn't turn their territory neutral
+            ChangeTurn(); // Change turn before setting new home
+            SetHexagonStateForTeam(hex, team);
+            UpdateTeamIconPosition(hex, team);
+            ChangeTurn(); // Change turn after setting new home
         }
     }
+
+    private void SetHexagonStateForTeam(Hexagon hex, string team) {
+        HexagonStates homeTeam = team == "homeTeam2" ? HomeTeam2 : HomeTeam1;
+        hex.SetHexagonState(homeTeam);
+    }
+
+    private void UpdateTeamIconPosition(Hexagon hex, string team) {
+        GameObject teamIcon = team == "homeTeam2" ? team2Icon : team1Icon;
+        teamIcon.SetActive(true);
+        teamIcon.transform.position = new Vector2(hex.HexagonX / 108f, hex.HexagonY / 108f);
+    }
+
 
     private Hexagon SelectRandomHexagonOfType(string state){
         List<Hexagon> targetHexes = AllHexagons.Where(hex => hex.HexagonCurrentState == state).ToList();
@@ -571,6 +606,7 @@ public class Board : MonoBehaviour
     }
 
     private void HasWon() {
+        bonusReminder.SetActive(false);
         if (!team1Turn) {
             winnerBlockText.text = "Team 1 has Won!";
         } else {
