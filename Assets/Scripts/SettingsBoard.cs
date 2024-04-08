@@ -16,6 +16,11 @@ public class SettingsBoard : MonoBehaviour
     private Image colorResultTeam1;
     [SerializeField]
     private Image colorResultTeam2;
+    [SerializeField]
+    private GameObject unsavedPopup;
+
+    //Fields
+    public bool unsavedChanges = false;
 
     //Properties 
     public Image ColorResultTeam1
@@ -73,7 +78,6 @@ public class SettingsBoard : MonoBehaviour
         // Convert HSL back to RGB
         Color modifiedColor = Color.HSVToRGB(h, s, l);
         return modifiedColor;
-    
     }
 
     public void SaveColour() {
@@ -89,6 +93,8 @@ public class SettingsBoard : MonoBehaviour
         PlayerPrefs.SetString("TerritoryTeam1Color", ColorUtility.ToHtmlStringRGB(ColorResultTeam1.color));
         PlayerPrefs.SetString("TerritoryTeam2Color", ColorUtility.ToHtmlStringRGB(ColorResultTeam2.color));
 
+        PlayerPrefs.SetString("ColorResultTeam1", ColorUtility.ToHtmlStringRGB(ColorResultTeam1.color));
+        PlayerPrefs.SetString("ColorResultTeam2", ColorUtility.ToHtmlStringRGB(ColorResultTeam2.color));
     }
 
     void SaveBoardSize() {
@@ -120,26 +126,40 @@ public class SettingsBoard : MonoBehaviour
         SaveColour();
         SaveBoardSize();
         PlayerPrefs.Save();
+        unsavedChanges = false;
         applySettingsNoise.Play();
     }
 
     public void SmallBoard() {
         SelectedBoardSize = "small";
         chooseSettingsNoise.Play();
+        unsavedChanges = true;
     }
 
     public void MediumBoard() {
         SelectedBoardSize = "medium";
         chooseSettingsNoise.Play();
+        unsavedChanges = true;
     }
 
     public void LargeBoard() {
         SelectedBoardSize = "large";
         chooseSettingsNoise.Play();
+        unsavedChanges = true;
     }
 
     private IEnumerator LoadSceneCoroutine(string scene) {
         yield return new WaitWhile(() => mainMenuNoise.isPlaying);
+        yield return new WaitWhile(() => applySettingsNoise.isPlaying);
+
         SceneManager.LoadScene(scene);
+    }
+
+    public void AttemptToCloseSettings() {
+        if (unsavedChanges == false){
+            LoadMenuScene();
+        } else{
+            unsavedPopup.SetActive(true);
+        }
     }
 }

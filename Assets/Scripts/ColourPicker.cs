@@ -17,10 +17,10 @@ public class ColourPicker : MonoBehaviour, IPointerClickHandler
         output.a = 1.0f;
         if (team == "team1") {
             FindObjectOfType<SettingsBoard>().ColorResultTeam1.color = output;
-            PlayerPrefs.SetString("ColorResultTeam1", ColorUtility.ToHtmlStringRGB(output));
+            FindObjectOfType<SettingsBoard>().unsavedChanges = true;
         } else {
             FindObjectOfType<SettingsBoard>().ColorResultTeam2.color = output;
-            PlayerPrefs.SetString("ColorResultTeam2", ColorUtility.ToHtmlStringRGB(output));
+            FindObjectOfType<SettingsBoard>().unsavedChanges = true;
         }
     }
     
