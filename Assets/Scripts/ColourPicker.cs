@@ -17,20 +17,16 @@ public class ColourPicker : MonoBehaviour, IPointerClickHandler
         output.a = 1.0f;
         if (team == "team1") {
             FindObjectOfType<SettingsBoard>().ColorResultTeam1.color = output;
+            PlayerPrefs.SetString("ColorResultTeam1", ColorUtility.ToHtmlStringRGB(output));
         } else {
             FindObjectOfType<SettingsBoard>().ColorResultTeam2.color = output;
+            PlayerPrefs.SetString("ColorResultTeam2", ColorUtility.ToHtmlStringRGB(output));
         }
     }
     
     private Color Pick(Vector2 screenPoint, Image imageToPick) {
-        //Debug.Log("Screen Point: " + screenPoint);
-
         RectTransformUtility.ScreenPointToLocalPointInRectangle(imageToPick.rectTransform, screenPoint, Camera.main, out Vector2 localPoint);
-        //Debug.Log("Local Point: " + localPoint);
-
         localPoint += imageToPick.rectTransform.sizeDelta / 2;
-        //Debug.Log("Adjusted Local Point: " + localPoint);
-
         Texture2D texture = imageToPick.sprite.texture;
         Vector2Int texturePoint = new Vector2Int(
             Mathf.Clamp((int)(texture.width * (localPoint.x / imageToPick.rectTransform.sizeDelta.x)), 0, texture.width - 1),

@@ -17,7 +17,7 @@ public class SettingsBoard : MonoBehaviour
     [SerializeField]
     private Image colorResultTeam2;
 
-    //Properties
+    //Properties 
     public Image ColorResultTeam1
     {
         get => colorResultTeam1;
@@ -28,8 +28,40 @@ public class SettingsBoard : MonoBehaviour
         get => colorResultTeam2;
         set => colorResultTeam2 = value;
     }
+    public string SelectedBoardSize { get; private set; }
 
     //Methods
+
+    void Start() {
+        InitializeColors();
+    }
+
+    private void InitializeColors() {
+        string[] colorKeys = {
+            "ColorResultTeam1", "ColorResultTeam2"
+        };
+
+        foreach (string key in colorKeys)
+        {
+            string colorString = "#" + PlayerPrefs.GetString(key);
+
+            if (UnityEngine.ColorUtility.TryParseHtmlString(colorString, out Color parsedColor))
+            {
+                switch (key)
+                {
+                    case "ColorResultTeam1":
+                        ColorResultTeam1.color = parsedColor;
+                        break;
+                    case "ColorResultTeam2":
+                        ColorResultTeam2.color = parsedColor;
+                        break;
+                    default:
+                        Debug.LogWarning($"Color key {key} not recognized.");
+                        break;
+                }
+            }
+        }
+    }
     private Color CreateNewColor(Color colorResultTeam1, float saturationDelta, float lightnessDelta) {
         // Convert RGB to HSL
         Color.RGBToHSV(colorResultTeam1, out float h, out float s, out float l);
@@ -58,6 +90,26 @@ public class SettingsBoard : MonoBehaviour
         PlayerPrefs.SetString("TerritoryTeam2Color", ColorUtility.ToHtmlStringRGB(ColorResultTeam2.color));
 
     }
+
+    void SaveBoardSize() {
+        switch (SelectedBoardSize)
+        {   
+            case "small":
+                PlayerPrefs.SetInt("BoardCols", 7);
+                PlayerPrefs.SetInt("BoardRows", 9);
+                break;
+            case "medium":
+                PlayerPrefs.SetInt("BoardCols", 9);
+                PlayerPrefs.SetInt("BoardRows", 11);
+                break;
+            case "large":
+                PlayerPrefs.SetInt("BoardCols", 11);
+                PlayerPrefs.SetInt("BoardRows", 13);
+                break;
+            default:
+                break;
+        }
+    }
     
     public void LoadMenuScene() {
         mainMenuNoise.Play();
@@ -66,24 +118,23 @@ public class SettingsBoard : MonoBehaviour
 
     public void ApplySettings() {
         SaveColour();
+        SaveBoardSize();
+        PlayerPrefs.Save();
         applySettingsNoise.Play();
     }
 
     public void SmallBoard() {
-        PlayerPrefs.SetInt("BoardCols", 7);
-        PlayerPrefs.SetInt("BoardRows", 9);
+        SelectedBoardSize = "small";
         chooseSettingsNoise.Play();
     }
 
     public void MediumBoard() {
-        PlayerPrefs.SetInt("BoardCols", 9);
-        PlayerPrefs.SetInt("BoardRows", 11);
+        SelectedBoardSize = "medium";
         chooseSettingsNoise.Play();
     }
 
     public void LargeBoard() {
-        PlayerPrefs.SetInt("BoardCols", 11);
-        PlayerPrefs.SetInt("BoardRows", 13);
+        SelectedBoardSize = "large";
         chooseSettingsNoise.Play();
     }
 
