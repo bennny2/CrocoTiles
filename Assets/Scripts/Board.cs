@@ -130,6 +130,19 @@ public class Board : MonoBehaviour
         SetCameraZoom();
         LoadDictionary();
         ProcessGlowingHexagons();
+        Loadicons();
+    }
+
+    private void Loadicons(){
+        team1Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>(PlayerPrefs.GetString("team1Icon"));
+        team2Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>(PlayerPrefs.GetString("team2Icon"));
+
+        if (team1Icon.GetComponent<Image>().sprite == null){
+            team1Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>("apple");
+        }
+        if (team2Icon.GetComponent<Image>().sprite == null){
+            team2Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>("bee");
+        }
     }
 
     private void LoadDictionary() {

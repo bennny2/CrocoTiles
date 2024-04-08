@@ -27,6 +27,8 @@ public class SettingsBoard : MonoBehaviour
 
     //Fields
     public bool unsavedChanges = false;
+    private string currentTeam1Icon;
+    private string currentTeam2Icon;
 
     //Properties 
     public Image ColorResultTeam1
@@ -74,28 +76,81 @@ public class SettingsBoard : MonoBehaviour
         }
     }
 
+    private void SaveIcon(){
+        PlayerPrefs.SetString("team1Icon", currentTeam1Icon);
+        PlayerPrefs.SetString("team2Icon", currentTeam2Icon);
+    }
+
     public void MakeTeam1Burger(){
         team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("burger");
+        currentTeam1Icon = "burger";
+        unsavedChanges = true;
     }
 
     public void MakeTeam2Burger(){
         team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("burger");
+        currentTeam2Icon = "burger";
+        unsavedChanges = true;
     }
 
     public void MakeTeam1Coffee(){
         team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("coffee");
+        currentTeam1Icon = "coffee";
+        unsavedChanges = true;
     }
 
     public void MakeTeam2Coffee(){
         team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("coffee");
+        currentTeam2Icon = "coffee";
+        unsavedChanges = true;
     }
     
     public void MakeTeam1Meat(){
         team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("meat");
+        currentTeam1Icon = "meat";
+        unsavedChanges = true;
     }
 
     public void MakeTeam2Meat(){
         team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("meat");
+        currentTeam2Icon = "meat";
+        unsavedChanges = true;
+    }
+
+    public void MakeTeam1Apple(){
+        team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("apple");
+        currentTeam1Icon = "apple";
+        unsavedChanges = true;
+    }
+
+    public void MakeTeam2Apple(){
+        team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("apple");
+        currentTeam2Icon = "apple";
+        unsavedChanges = true;
+    }
+
+    public void MakeTeam1Bee(){
+        team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("bee");
+        currentTeam1Icon = "bee";
+        unsavedChanges = true;
+    }
+
+    public void MakeTeam2Bee(){
+        team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("bee");
+        currentTeam2Icon = "bee";
+        unsavedChanges = true;
+    }
+
+    public void MakeTeam1Cocktail(){
+        team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("cocktail");
+        currentTeam1Icon = "cocktail";
+        unsavedChanges = true;
+    }
+
+    public void MakeTeam2Cocktail(){
+        team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("cocktail");
+        currentTeam2Icon = "cocktail";
+        unsavedChanges = true;
     }
 
     private Color CreateNewColor(Color colorResultTeam1, float saturationDelta, float lightnessDelta) {
@@ -156,6 +211,7 @@ public class SettingsBoard : MonoBehaviour
     public void ApplySettings() {
         SaveColour();
         SaveBoardSize();
+        SaveIcon();
         PlayerPrefs.Save();
         unsavedChanges = false;
         applySettingsNoise.Play();
