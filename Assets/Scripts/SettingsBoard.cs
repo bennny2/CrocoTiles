@@ -19,6 +19,12 @@ public class SettingsBoard : MonoBehaviour
     [SerializeField]
     private GameObject unsavedPopup;
 
+
+    [SerializeField]
+    private GameObject team1IconShowcase;
+    [SerializeField]
+    private GameObject team2IconShowcase;
+
     //Fields
     public bool unsavedChanges = false;
 
@@ -67,6 +73,31 @@ public class SettingsBoard : MonoBehaviour
             }
         }
     }
+
+    public void MakeTeam1Burger(){
+        team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("burger");
+    }
+
+    public void MakeTeam2Burger(){
+        team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("burger");
+    }
+
+    public void MakeTeam1Coffee(){
+        team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("coffee");
+    }
+
+    public void MakeTeam2Coffee(){
+        team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("coffee");
+    }
+    
+    public void MakeTeam1Meat(){
+        team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("meat");
+    }
+
+    public void MakeTeam2Meat(){
+        team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("meat");
+    }
+
     private Color CreateNewColor(Color colorResultTeam1, float saturationDelta, float lightnessDelta) {
         // Convert RGB to HSL
         Color.RGBToHSV(colorResultTeam1, out float h, out float s, out float l);
