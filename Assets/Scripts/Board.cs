@@ -541,15 +541,15 @@ public class Board : MonoBehaviour
 
         switch (boardCols) {
             case 7:
-                camSize = 2.4f;
+                camSize = 2.6f;
                 camMove = new(-0.65f, -0.35f);
                 break;
             case 9:
-                camSize = 2.7f;
+                camSize = 2.9f;
                 camMove = new(0f, 0f);
                 break;
             case 11:
-                camSize = 3f;
+                camSize = 3.2f;
                 camMove = new(0.65f, 0.35f);
                 break;
         }
