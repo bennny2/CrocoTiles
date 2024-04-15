@@ -158,8 +158,8 @@ public class Board : MonoBehaviour
     }
 
     private void InitializeHexagonsOnBoard() {
-        float boardCols = PlayerPrefs.GetInt("BoardCols", 7);
-        float boardRows = PlayerPrefs.GetInt("BoardRows", 9);
+        float boardCols = PlayerPrefs.GetInt("BoardCols", 9);
+        float boardRows = PlayerPrefs.GetInt("BoardRows", 11);
 
         float x = 0;
         float y = 0;
@@ -513,7 +513,7 @@ public class Board : MonoBehaviour
     private void SetHomeBases() {
 
         //the math only works if there are two more rows than columns in the board eg. 7 cols and 9 rows
-        int boardCols = PlayerPrefs.GetInt("BoardCols", 7);
+        int boardCols = PlayerPrefs.GetInt("BoardCols", 9);
         int base1, base2;
 
         int halfBoardColsRoundedUp = (int)Math.Ceiling((double)boardCols / 2);
@@ -535,7 +535,7 @@ public class Board : MonoBehaviour
 
     private void SetCameraZoom() {
         
-        float boardCols = PlayerPrefs.GetInt("BoardCols", 7);
+        float boardCols = PlayerPrefs.GetInt("BoardCols", 9);
         float camSize = 2.4f;
         Vector3 camMove = new(-0.65f, -0.35f);
 
