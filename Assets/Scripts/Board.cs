@@ -64,6 +64,8 @@ public class Board : MonoBehaviour
     private GameObject team2Icon;
     [SerializeField]
     private GameObject bonusReminder;
+    [SerializeField]
+    private GameObject autoShufflePopup;
 
     // Fields
     private List<Hexagon> allHexagons;
@@ -73,6 +75,7 @@ public class Board : MonoBehaviour
 
 
     private bool team1Turn = true;
+    private int shuffleCounter = 0;
     
     // Properties
     public List<Hexagon> AllHexagons
@@ -341,7 +344,7 @@ public class Board : MonoBehaviour
 
     private void CheckBoardIsPlayable() {
         if (!trie.CanFormValidWord(AllHexagons)) {
-            ShuffleLetters();
+            StartCoroutine(ShufflePopup2Seconds());
         }
     }
 
@@ -451,6 +454,7 @@ public class Board : MonoBehaviour
         CheckBonusTurn();
         audioWordSubmit.Play();
         ProcessGlowingHexagons();
+        CheckAutoShuffle();
     }
 
     private void ProcessInvalidWord() {
@@ -647,6 +651,24 @@ public class Board : MonoBehaviour
         if (Input.GetMouseButtonDown(1)) {
             ClearWord();
         }
+    }
+
+    void CheckAutoShuffle() {
+        if (shuffleCounter < 10)
+        {
+            shuffleCounter += 1;
+        } else {
+            StartCoroutine(ShufflePopup2Seconds());
+            shuffleCounter = 0;
+        }
+        
+    }
+
+    IEnumerator ShufflePopup2Seconds() {
+        autoShufflePopup.SetActive(true);
+        yield return new WaitForSeconds(2);
+        ShuffleLetters();
+        autoShufflePopup.SetActive(false);
     }
 }
 
