@@ -525,7 +525,7 @@ public class Board : MonoBehaviour
         {
             MakePressedHexagonsTerritory(hex);
         }
-        Letter.AddLetterToList(CurrentWordObjectOnScreen.CurrentWordText.text);
+        Letter.AddLetterToAvailableLettersPool(CurrentWordObjectOnScreen.CurrentWordText.text);
         ClearPressedHexagonsValidWord();
         ChangeTurn();
         ResetWordState();

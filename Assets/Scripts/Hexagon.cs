@@ -116,7 +116,7 @@ public class Hexagon : MonoBehaviour
 
             case "neutral":
                 if (string.IsNullOrWhiteSpace(HexagonText.text)) { 
-                    HexagonText.text = Letter.GenerateLetter();
+                    SetLetter();
                 }
                 break;
 
