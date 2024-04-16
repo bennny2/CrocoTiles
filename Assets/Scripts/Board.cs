@@ -470,6 +470,7 @@ public class Board : MonoBehaviour
         winnerBlock.SetActive(false);
         playAgainButton.gameObject.SetActive(false);
         quitButton.gameObject.SetActive(false);
+        shuffleCounter = 0;
         Letter.InitializeLetters();
         ClearLetters();
         MakeAllHexagonsInvisible();
