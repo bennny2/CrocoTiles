@@ -132,7 +132,7 @@ public class Board : MonoBehaviour
         InitializeColors();
         MakeAllHexagonsInvisible();
         SetHomeBases();
-        SetCameraZoom();
+        SetCameraZoomAndPosition();
         LoadDictionary();
         ProcessGlowingHexagons();
         Loadicons();
@@ -473,6 +473,7 @@ public class Board : MonoBehaviour
         MakeAllHexagonsInvisible();
         SetHomeBases();
         ProcessGlowingHexagons();
+        SetCameraZoomAndPosition();
         Team1Turn = true;
     }
 
@@ -547,11 +548,11 @@ public class Board : MonoBehaviour
         ListOfLettersPressed.Clear();
     }
 
-    private void SetCameraZoom() {
-        
+    private void SetCameraZoomAndPosition() {
+        Camera.main.transform.position = new Vector3(0, 0, -10);
         float boardCols = PlayerPrefs.GetInt("BoardCols", 9);
-        float camSize = 2.4f;
-        Vector3 camMove = new(-0.65f, -0.35f);
+        float camSize = 2.9f;
+        Vector3 camMove = new(0f, 0f);
 
         switch (boardCols) {
             case 7:
