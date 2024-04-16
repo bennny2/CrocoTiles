@@ -7,19 +7,21 @@ using UnityEngine.UI;
 
 public class Hexagon : MonoBehaviour
 {
+
+    // Serialized Fields
+
+    [SerializeField]
+    private string hexagonCurrentState;
+
     // Fields
 
     private Board boardObject;
     private Button hexagonButton;
-    [SerializeField]
-    private string hexagonCurrentState;
     private TextMeshProUGUI hexagonText;
     private Image hexagonImage;
-
     private float hexagonX;
     private float hexagonY;
     private float hexagonZ;
-
     public const int HORIZONTALOFFSET = 70; 
     public const int VERTICALOFFSET = 80; 
     public const int VERTICALDIAGONALOFFSET = 40; 

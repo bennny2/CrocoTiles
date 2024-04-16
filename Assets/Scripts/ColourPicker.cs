@@ -4,11 +4,15 @@ using UnityEngine.UI;
 
 public class ColourPicker : MonoBehaviour, IPointerClickHandler
 {
-    // Fields
-    
-    public Color output;
+
+    // Serialize Fields
+
     [SerializeField]
     private string team;
+
+    // Fields
+
+    public Color output;
 
     // Class Methods
 

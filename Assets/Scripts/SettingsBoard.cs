@@ -5,7 +5,8 @@ using System.Collections;
 
 public class SettingsBoard : MonoBehaviour
 {
-    //Serialized Fields
+    // Serialized Fields
+
     [SerializeField]
     private AudioSource applySettingsNoise;
     [SerializeField]
@@ -18,19 +19,19 @@ public class SettingsBoard : MonoBehaviour
     private Image colorResultTeam2;
     [SerializeField]
     private GameObject unsavedPopup;
-
-
     [SerializeField]
     private GameObject team1IconShowcase;
     [SerializeField]
     private GameObject team2IconShowcase;
 
-    //Fields
+    // Fields
+
     public bool unsavedChanges = false;
     private string currentTeam1Icon;
     private string currentTeam2Icon;
 
-    //Properties 
+    // Properties 
+
     public Image ColorResultTeam1
     {
         get => colorResultTeam1;
@@ -43,10 +44,35 @@ public class SettingsBoard : MonoBehaviour
     }
     public string SelectedBoardSize { get; private set; }
 
-    //Methods
+    // Class Methods
 
     void Start() {
         InitializeColors();
+    }
+
+    public void ApplySettings() {
+        SaveColour();
+        SaveBoardSize();
+        SaveIcon();
+        PlayerPrefs.Save();
+        unsavedChanges = false;
+        applySettingsNoise.Play();
+    }
+
+    public void AttemptToCloseSettings() {
+        if (unsavedChanges == false){
+            LoadMenuScene();
+        } else{
+            unsavedPopup.SetActive(true);
+        }
+    }
+
+    private Color CreateNewColor(Color colorResultTeam1, float saturationDelta, float lightnessDelta) {
+        Color.RGBToHSV(colorResultTeam1, out float h, out float s, out float l);
+        s = Mathf.Clamp01(s + saturationDelta);
+        l = Mathf.Clamp01(l + lightnessDelta);
+        Color modifiedColor = Color.HSVToRGB(h, s, l);
+        return modifiedColor;
     }
 
     private void InitializeColors() {
@@ -57,9 +83,7 @@ public class SettingsBoard : MonoBehaviour
         foreach (string key in colorKeys)
         {
             string colorString = "#" + PlayerPrefs.GetString(key);
-
-            if (UnityEngine.ColorUtility.TryParseHtmlString(colorString, out Color parsedColor))
-            {
+            if (UnityEngine.ColorUtility.TryParseHtmlString(colorString, out Color parsedColor)) {
                 switch (key)
                 {
                     case "ColorResultTeam1":
@@ -76,94 +100,120 @@ public class SettingsBoard : MonoBehaviour
         }
     }
 
-    private void SaveIcon(){
-        PlayerPrefs.SetString("team1Icon", currentTeam1Icon);
-        PlayerPrefs.SetString("team2Icon", currentTeam2Icon);
+    public void LargeBoard() {
+        SelectedBoardSize = "large";
+        chooseSettingsNoise.Play();
+        unsavedChanges = true;
     }
 
-    public void MakeTeam1Burger(){
+    private IEnumerator LoadSceneCoroutine(string scene) {
+        yield return new WaitWhile(() => mainMenuNoise.isPlaying);
+        yield return new WaitWhile(() => applySettingsNoise.isPlaying);
+
+        SceneManager.LoadScene(scene);
+    }
+
+    public void LoadMenuScene() {
+        mainMenuNoise.Play();
+        StartCoroutine(LoadSceneCoroutine("MainMenuScene"));
+    } 
+
+    public void MakeTeam1Burger() {
         team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("burger");
         currentTeam1Icon = "burger";
         unsavedChanges = true;
     }
 
-    public void MakeTeam2Burger(){
+    public void MakeTeam2Burger() {
         team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("burger");
         currentTeam2Icon = "burger";
         unsavedChanges = true;
     }
 
-    public void MakeTeam1Coffee(){
+    public void MakeTeam1Coffee() {
         team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("coffee");
         currentTeam1Icon = "coffee";
         unsavedChanges = true;
     }
 
-    public void MakeTeam2Coffee(){
+    public void MakeTeam2Coffee() {
         team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("coffee");
         currentTeam2Icon = "coffee";
         unsavedChanges = true;
     }
     
-    public void MakeTeam1Meat(){
+    public void MakeTeam1Meat() {
         team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("meat");
         currentTeam1Icon = "meat";
         unsavedChanges = true;
     }
 
-    public void MakeTeam2Meat(){
+    public void MakeTeam2Meat() {
         team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("meat");
         currentTeam2Icon = "meat";
         unsavedChanges = true;
     }
 
-    public void MakeTeam1Apple(){
+    public void MakeTeam1Apple() {
         team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("apple");
         currentTeam1Icon = "apple";
         unsavedChanges = true;
     }
 
-    public void MakeTeam2Apple(){
+    public void MakeTeam2Apple() {
         team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("apple");
         currentTeam2Icon = "apple";
         unsavedChanges = true;
     }
 
-    public void MakeTeam1Bee(){
+    public void MakeTeam1Bee() {
         team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("bee");
         currentTeam1Icon = "bee";
         unsavedChanges = true;
     }
 
-    public void MakeTeam2Bee(){
+    public void MakeTeam2Bee() {
         team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("bee");
         currentTeam2Icon = "bee";
         unsavedChanges = true;
     }
 
-    public void MakeTeam1Cocktail(){
+    public void MakeTeam1Cocktail() {
         team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("cocktail");
         currentTeam1Icon = "cocktail";
         unsavedChanges = true;
     }
 
-    public void MakeTeam2Cocktail(){
+    public void MakeTeam2Cocktail() {
         team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("cocktail");
         currentTeam2Icon = "cocktail";
         unsavedChanges = true;
     }
 
-    private Color CreateNewColor(Color colorResultTeam1, float saturationDelta, float lightnessDelta) {
-        // Convert RGB to HSL
-        Color.RGBToHSV(colorResultTeam1, out float h, out float s, out float l);
-        
-        // Modify saturation and lightness
-        s = Mathf.Clamp01(s + saturationDelta);
-        l = Mathf.Clamp01(l + lightnessDelta);
+    public void MediumBoard() {
+        SelectedBoardSize = "medium";
+        chooseSettingsNoise.Play();
+        unsavedChanges = true;
+    }
 
-        // Convert HSL back to RGB
-        Color modifiedColor = Color.HSVToRGB(h, s, l);
-        return modifiedColor;
+    private void SaveBoardSize() {
+        switch (SelectedBoardSize)
+        {   
+            case "small":
+                PlayerPrefs.SetInt("BoardCols", 7);
+                PlayerPrefs.SetInt("BoardRows", 9);
+                break;
+            case "medium":
+                PlayerPrefs.SetInt("BoardCols", 9);
+                PlayerPrefs.SetInt("BoardRows", 11);
+                break;
+            case "large":
+                PlayerPrefs.SetInt("BoardCols", 11);
+                PlayerPrefs.SetInt("BoardRows", 13);
+                break;
+            default:
+                break;
+        }
     }
 
     public void SaveColour() {
@@ -183,70 +233,14 @@ public class SettingsBoard : MonoBehaviour
         PlayerPrefs.SetString("ColorResultTeam2", ColorUtility.ToHtmlStringRGB(ColorResultTeam2.color));
     }
 
-    void SaveBoardSize() {
-        switch (SelectedBoardSize)
-        {   
-            case "small":
-                PlayerPrefs.SetInt("BoardCols", 7);
-                PlayerPrefs.SetInt("BoardRows", 9);
-                break;
-            case "medium":
-                PlayerPrefs.SetInt("BoardCols", 9);
-                PlayerPrefs.SetInt("BoardRows", 11);
-                break;
-            case "large":
-                PlayerPrefs.SetInt("BoardCols", 11);
-                PlayerPrefs.SetInt("BoardRows", 13);
-                break;
-            default:
-                break;
-        }
-    }
-    
-    public void LoadMenuScene() {
-        mainMenuNoise.Play();
-        StartCoroutine(LoadSceneCoroutine("MainMenuScene"));
-    } 
-
-    public void ApplySettings() {
-        SaveColour();
-        SaveBoardSize();
-        SaveIcon();
-        PlayerPrefs.Save();
-        unsavedChanges = false;
-        applySettingsNoise.Play();
+    private void SaveIcon() {
+        PlayerPrefs.SetString("team1Icon", currentTeam1Icon);
+        PlayerPrefs.SetString("team2Icon", currentTeam2Icon);
     }
 
     public void SmallBoard() {
         SelectedBoardSize = "small";
         chooseSettingsNoise.Play();
         unsavedChanges = true;
-    }
-
-    public void MediumBoard() {
-        SelectedBoardSize = "medium";
-        chooseSettingsNoise.Play();
-        unsavedChanges = true;
-    }
-
-    public void LargeBoard() {
-        SelectedBoardSize = "large";
-        chooseSettingsNoise.Play();
-        unsavedChanges = true;
-    }
-
-    private IEnumerator LoadSceneCoroutine(string scene) {
-        yield return new WaitWhile(() => mainMenuNoise.isPlaying);
-        yield return new WaitWhile(() => applySettingsNoise.isPlaying);
-
-        SceneManager.LoadScene(scene);
-    }
-
-    public void AttemptToCloseSettings() {
-        if (unsavedChanges == false){
-            LoadMenuScene();
-        } else{
-            unsavedPopup.SetActive(true);
-        }
     }
 }

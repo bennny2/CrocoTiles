@@ -3,7 +3,7 @@ using TMPro;
 
 public class CurrentWord : MonoBehaviour
 {
-    // Fields
+    // Serialized Fields
 
     [SerializeField]
     private TextMeshProUGUI currentWordText;

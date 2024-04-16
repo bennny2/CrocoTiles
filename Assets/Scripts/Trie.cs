@@ -1,22 +1,20 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEngine;
 
 class TrieNode
 {
-    public TrieNode[] Children { get; } = new TrieNode[26]; // Initialize the array with 26 elements
 
+    // Fields
+    
+    public TrieNode[] Children { get; } = new TrieNode[26]; 
     public bool IsEndOfWord { get; set; }
 
     // Constructor
+
     public TrieNode()
     {
-        // Initialize all elements of the Children array to null
-        for (int i = 0; i < Children.Length; i++)
-        {
+        for (int i = 0; i < Children.Length; i++) {
             Children[i] = null;
         }
     }
@@ -25,45 +23,30 @@ class TrieNode
 
 class Trie
 {
+
+    // Fields
+
     private readonly TrieNode root;
+
+    // Constructor
 
     public Trie()
     {
         root = new TrieNode();
     }
 
-    public void Insert(string word)
-    {
-        TrieNode node = root;
-        foreach (char c in word)
-        {
-            int index = c - 'a';
-            if (node.Children[index] == null)
-                node.Children[index] = new TrieNode();
-            node = node.Children[index];
+    // Class Methods
+
+    public bool CanFormValidWord(List<Hexagon> AllHexagons) {
+        List<string> letters = new();
+        foreach (Hexagon hex in AllHexagons) {
+            if (!string.IsNullOrWhiteSpace(hex.HexagonText.text) && hex.HexagonText.text != "*" ) {
+                letters.Add(hex.HexagonText.text);
+            }
         }
-        node.IsEndOfWord = true;
+        return CanTheseLettersMakeAWord(letters);
     }
 
-    public bool Search(string word)
-    {
-        TrieNode node = SearchPrefix(word);
-        return node != null && node.IsEndOfWord;
-    }
-
-    private TrieNode SearchPrefix(string word)
-    {
-        TrieNode node = root;
-        foreach (char c in word)
-        {
-            int index = c - 'a';
-            if (node.Children[index] == null)
-                return null;
-            node = node.Children[index];
-        }
-        return node;
-    }
-    
     private bool CanTheseLettersMakeAWord(List<string> letters) {
         IEnumerable<string> letterEnumerable = letters;
 
@@ -80,14 +63,33 @@ class Trie
         return false;
     }
 
-    public bool CanFormValidWord(List<Hexagon> AllHexagons) {
-        List<string> letters = new();
-        foreach (Hexagon hex in AllHexagons) {
-            if (!string.IsNullOrWhiteSpace(hex.HexagonText.text) && hex.HexagonText.text != "*" ) {
-                letters.Add(hex.HexagonText.text);
-            }
+    public void Insert(string word) {
+        TrieNode node = root;
+        foreach (char c in word)
+        {
+            int index = c - 'a';
+            if (node.Children[index] == null)
+                node.Children[index] = new TrieNode();
+            node = node.Children[index];
         }
-        return CanTheseLettersMakeAWord(letters);
+        node.IsEndOfWord = true;
+    }
+
+    public bool Search(string word) {
+        TrieNode node = SearchPrefix(word);
+        return node != null && node.IsEndOfWord;
+    }
+
+    private TrieNode SearchPrefix(string word) {
+        TrieNode node = root;
+        foreach (char c in word)
+        {
+            int index = c - 'a';
+            if (node.Children[index] == null)
+                return null;
+            node = node.Children[index];
+        }
+        return node;
     }
     
     private IEnumerable<IEnumerable<T>> GetPermutationsWithDuplicates<T>(IEnumerable<T> list, int length) {
@@ -105,7 +107,6 @@ class Trie
                         .Where(kv => kv.Value > partialPermutation.Count(e => EqualityComparer<T>.Default.Equals(kv.Key, e)))
                         .Select(kv => partialPermutation.Concat(new T[] { kv.Key })));
         }
-
         return GetPermutationsInternal(length);
     }
 }

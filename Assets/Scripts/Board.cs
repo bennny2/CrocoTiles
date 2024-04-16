@@ -6,11 +6,10 @@ using System;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
-using System.IO;
-using Unity.VisualScripting;
 
 public class Board : MonoBehaviour
 {
+    
     // Hexagon States   
 
     [SerializeField]
