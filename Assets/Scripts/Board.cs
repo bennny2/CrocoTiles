@@ -130,6 +130,7 @@ public class Board : MonoBehaviour
 
     void Start() {
         InitializeColors();
+        Letter.InitializeLetters();
         MakeAllHexagonsInvisible();
         SetHomeBases();
         SetCameraZoomAndPosition();
@@ -469,6 +470,7 @@ public class Board : MonoBehaviour
         winnerBlock.SetActive(false);
         playAgainButton.gameObject.SetActive(false);
         quitButton.gameObject.SetActive(false);
+        Letter.InitializeLetters();
         ClearLetters();
         MakeAllHexagonsInvisible();
         SetHomeBases();

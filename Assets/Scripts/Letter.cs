@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-
 
 public static class Letter
 {
@@ -11,7 +9,8 @@ public static class Letter
 
     private static readonly Random random = new();
     private static readonly List<char> inPlayLettersPool = new();
-    private static readonly List<char> availableLettersPool = new()
+    private static List<char> availableLettersPool = new();
+    private static readonly List<char> availableLettersPoolTemplate = new()
     {
         'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a',
         'b', 'b', 'b', 'b',
@@ -131,6 +130,7 @@ public static class Letter
     public static string GenerateLetter() {
         bool validLetter = false; 
         char newLetter = '5';
+
         while (!validLetter) {
             newLetter = availableLettersPool[random.Next(0, availableLettersPool.Count-1)];
             validLetter = CheckForLetterRestrictions(newLetter);
@@ -138,6 +138,10 @@ public static class Letter
         DeleteLetterFromAvailableLettersPool(newLetter);
         AddLetterToInPlayLettersPool(newLetter);
         return newLetter.ToString();
+    }
+
+    public static void InitializeLetters() {
+        availableLettersPool = new List<char>(availableLettersPoolTemplate);
     }
 
     public static char StringToLetter(string word) {

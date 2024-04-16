@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "TileWarNew.sln"
+    "dotnet.defaultSolution": "CrocoTiles.sln"
 }
