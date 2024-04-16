@@ -83,7 +83,6 @@ public static class Letter
             totalConsonants += 1;
         }
 
-
         if (totalLetters < 10 && amountOfThatLetterInPlay > 1) {
             return false;
         }
@@ -96,14 +95,12 @@ public static class Letter
         if (totalLetters < 25 && amountOfThatLetterInPlay > 4) {
             return false;
         }
-        /*
         if (totalVowels / totalLetters > 0.6f) {
             return false;
         }      
         if (totalConsonants / totalLetters > 0.75f) {
             return false;
         }
-        */
         
         return true;
     }
