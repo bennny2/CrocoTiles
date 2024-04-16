@@ -4,6 +4,7 @@ using UnityEngine;
 public class HexagonStates
 {
     // Fields
+
     [SerializeField]
     private Color fillColor;
 
@@ -11,6 +12,7 @@ public class HexagonStates
     private string stateName;
 
     // Properties
+    
     public Color FillColor 
     {
         get => fillColor;

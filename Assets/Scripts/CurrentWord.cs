@@ -4,35 +4,32 @@ using TMPro;
 public class CurrentWord : MonoBehaviour
 {
     // Fields
+
     [SerializeField]
     private TextMeshProUGUI currentWordText;
 
-    //Property
+    // Properties
+
     public TextMeshProUGUI CurrentWordText => currentWordText;
 
     // Class Methods
-    private void Awake()
-    {
+
+    private void Awake() {
         InitializeComponents();
     }
 
-    private void InitializeComponents()
-    {
+    private void InitializeComponents() {
         currentWordText = GetComponentInChildren<TextMeshProUGUI>();
-        if (currentWordText == null)
-        {
+        if (currentWordText == null) {
             Debug.LogError("TextMeshProUGUI component not found in children.", this);
         }
     }
 
-    public void UpdateCurrentWord(string word)
-    {
-        if (CurrentWordText != null)
-        {
+    public void UpdateCurrentWord(string word) {
+        if (CurrentWordText != null) {
             CurrentWordText.text = word;
         }
-        else
-        {
+        else {
             Debug.LogError("TextMeshProUGUI component not initialized.", this);
         }
     }

@@ -4,13 +4,25 @@ using UnityEngine.UI;
 
 public class ColourPicker : MonoBehaviour, IPointerClickHandler
 {
-    //Fields
+    // Fields
+    
     public Color output;
-
     [SerializeField]
     private string team;
 
-    //Methods
+    // Class Methods
+
+    private Color Pick(Vector2 screenPoint, Image imageToPick) {
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(imageToPick.rectTransform, screenPoint, Camera.main, out Vector2 localPoint);
+        localPoint += imageToPick.rectTransform.sizeDelta / 2;
+        Texture2D texture = imageToPick.sprite.texture;
+        Vector2Int texturePoint = new Vector2Int(
+            Mathf.Clamp((int)(texture.width * (localPoint.x / imageToPick.rectTransform.sizeDelta.x)), 0, texture.width - 1),
+            Mathf.Clamp((int)(texture.height * (localPoint.y / imageToPick.rectTransform.sizeDelta.y)), 0, texture.height - 1)
+        );
+        return texture.GetPixel(texturePoint.x, texturePoint.y);
+    }
+
     public void OnPointerClick(PointerEventData eventData) {
         //FindObjectOfType<SettingsBoard>().ChooseSettingsNoise.Play();
         output = Pick(Camera.main.WorldToScreenPoint(eventData.position), GetComponent<Image>());
@@ -23,17 +35,5 @@ public class ColourPicker : MonoBehaviour, IPointerClickHandler
             FindObjectOfType<SettingsBoard>().unsavedChanges = true;
         }
     }
-    
-    private Color Pick(Vector2 screenPoint, Image imageToPick) {
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(imageToPick.rectTransform, screenPoint, Camera.main, out Vector2 localPoint);
-        localPoint += imageToPick.rectTransform.sizeDelta / 2;
-        Texture2D texture = imageToPick.sprite.texture;
-        Vector2Int texturePoint = new Vector2Int(
-            Mathf.Clamp((int)(texture.width * (localPoint.x / imageToPick.rectTransform.sizeDelta.x)), 0, texture.width - 1),
-            Mathf.Clamp((int)(texture.height * (localPoint.y / imageToPick.rectTransform.sizeDelta.y)), 0, texture.height - 1)
-        );
-        return texture.GetPixel(texturePoint.x, texturePoint.y);
-    }
-
 }
 

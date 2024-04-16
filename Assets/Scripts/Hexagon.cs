@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class Hexagon : MonoBehaviour
 {
     // Fields
+
     private Board boardObject;
     private Button hexagonButton;
     [SerializeField]
@@ -24,6 +25,7 @@ public class Hexagon : MonoBehaviour
     public const int VERTICALDIAGONALOFFSET = 40; 
 
     // Properties
+
     public Board BoardObject => boardObject;
     public TextMeshProUGUI HexagonText => hexagonText;
     public string HexagonCurrentState 
@@ -50,21 +52,13 @@ public class Hexagon : MonoBehaviour
     }
 
     // Class Methods
+
     void Awake() {
         InitilizeComponents();
         hexagonButton.onClick.AddListener(() => boardObject.HexagonPressed(this));
     }
 
-    void InitilizeComponents() {
-        boardObject = FindObjectOfType<Board>();
-        hexagonText = GetComponentInChildren<TextMeshProUGUI>();
-        HexagonText.outlineWidth = 0.15F;
-        HexagonText.outlineColor = Color.black;
-        hexagonImage = GetComponent<Image>();
-        hexagonButton = GetComponent<Button>();
-    }
-
-    public void DeleteLetter(){
+    public void DeleteLetter() {
         HexagonText.text = "";
     }
 
@@ -81,15 +75,22 @@ public class Hexagon : MonoBehaviour
 
             Hexagon touchingHexagon = boardObject.AllHexagons.FirstOrDefault(h => h.HexagonX == targetX && h.HexagonY == targetY);
 
-            if (touchingHexagon != null)
-            {
+            if (touchingHexagon != null) {
                 touchingHexagonsArray.Add(touchingHexagon);
 
             }
         }
-
         return touchingHexagonsArray;
     } 
+
+    void InitilizeComponents() {
+        boardObject = FindObjectOfType<Board>();
+        hexagonText = GetComponentInChildren<TextMeshProUGUI>();
+        HexagonText.outlineWidth = 0.15F;
+        HexagonText.outlineColor = Color.black;
+        hexagonImage = GetComponent<Image>();
+        hexagonButton = GetComponent<Button>();
+    }
 
     public void MakeTouchingHexagonsNeutralAroundHome() {
         List<Hexagon> touchingHexagons = FindTouchingHexagons();
@@ -100,10 +101,6 @@ public class Hexagon : MonoBehaviour
                 touchingHexagon.SetHexagonState(boardObject.Neutral);
             }
         }
-    }
-
-    public void SetLetter(){
-        HexagonText.text = Letter.GenerateLetter();
     }
 
     public void SetHexagonState(HexagonStates state) {
@@ -125,9 +122,12 @@ public class Hexagon : MonoBehaviour
                 Console.WriteLine("State not accepted");
                 break;
         }
-
         HexagonImage.color = state.FillColor;
         HexagonCurrentState = state.StateName;
+    }
+
+    public void SetLetter(){
+        HexagonText.text = Letter.GenerateLetter();
     }
 }
 

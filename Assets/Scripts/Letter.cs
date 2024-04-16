@@ -4,8 +4,10 @@ using System.Linq;
 
 public static class Letter
 {
-    private static readonly Random random = new();
 
+    // Fields
+
+    private static readonly Random random = new();
     private static readonly List<char> Letters = new()
     {
         'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a',
@@ -35,6 +37,8 @@ public static class Letter
         'y', 'y',
         'z'
     };
+
+    // Class Methods
 
     public static void AddLetterToList(string word) {
         List<char> charList = word.ToCharArray().ToList();

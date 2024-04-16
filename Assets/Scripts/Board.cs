@@ -12,6 +12,7 @@ using Unity.VisualScripting;
 public class Board : MonoBehaviour
 {
     // Hexagon States   
+
     [SerializeField]
     private HexagonStates homeTeam1;
     [SerializeField]
@@ -30,6 +31,7 @@ public class Board : MonoBehaviour
     private HexagonStates territoryTeam2;
 
     // Serialized Fields
+
     [SerializeField]
     private AudioSource audioClearWord;
     [SerializeField]
@@ -68,16 +70,16 @@ public class Board : MonoBehaviour
     private GameObject autoShufflePopup;
 
     // Fields
+
     private List<Hexagon> allHexagons;
     private bool bonusTurnActive;    
     private List<string> listOfLettersPressed = new();
     private Trie trie = new();
-
-
     private bool team1Turn = true;
     private int shuffleCounter = 0;
     
     // Properties
+
     public List<Hexagon> AllHexagons
     {
         get => allHexagons;
@@ -110,6 +112,7 @@ public class Board : MonoBehaviour
     }        
 
     // Hexagon State Properties
+
     public HexagonStates HomeTeam1 => homeTeam1;
     public HexagonStates HomeTeam2 => homeTeam2;
     public HexagonStates Invisible => invisible;
@@ -136,59 +139,107 @@ public class Board : MonoBehaviour
         Loadicons();
     }
 
-    private void Loadicons(){
-        team1Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>(PlayerPrefs.GetString("team1Icon"));
-        team2Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>(PlayerPrefs.GetString("team2Icon"));
-
-        if (team1Icon.GetComponent<Image>().sprite == null){
-            team1Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>("apple");
-        }
-        if (team2Icon.GetComponent<Image>().sprite == null){
-            team2Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>("bee");
+    void Update() {
+        if (Input.GetMouseButtonDown(1)) {
+            ClearWord();
         }
     }
 
-    private void LoadDictionary() {
-        TextAsset[] dictionaries = Resources.LoadAll<TextAsset>("collins");
-        foreach (TextAsset dictionary in dictionaries)
+    private void ChangeTurn() { 
+        if (Team1Turn){
+            Team1Turn = false;
+        } else{
+            Team1Turn = true;
+        }
+    }
+
+    private void CheckAutoShuffle() {
+        if (shuffleCounter < 10) {
+            shuffleCounter += 1;
+        } else {
+            StartCoroutine(ShufflePopup2Seconds());
+            shuffleCounter = 0;
+        }
+    }
+
+    private void CheckBoardIsPlayable() {
+        if (!trie.CanFormValidWord(AllHexagons)) {
+            StartCoroutine(ShufflePopup2Seconds());
+        }
+    }
+
+    private void CheckBonusTurn() {
+        if (BonusTurnActive == true) {
+            ChangeTurn();
+            BonusTurnActive = false;
+
+        }
+    }
+
+    private void CheckHomesAreSet() {
+        bool noHomeTeam1 = true;
+        bool noHomeTeam2 = true;
+        foreach (Hexagon hex in AllHexagons) {
+            if (hex.HexagonCurrentState == "homeTeam1") {
+                noHomeTeam1 = false;
+            }
+            if (hex.HexagonCurrentState == "homeTeam2") {
+                noHomeTeam2 = false;
+            }
+        }
+        if (noHomeTeam1 == true) {
+            SetNewHome("homeTeam1");
+        }
+        if (noHomeTeam2 == true) {
+            SetNewHome("homeTeam2");
+        }
+    }
+
+    private void ClearHexagon(Hexagon hex) {
+        hex.DeleteLetter();
+        hex.SetHexagonState(Neutral);
+    }
+
+    private void ClearInvalidHexagon(Hexagon hex) {
+        hex.SetHexagonState(Neutral);
+    }
+
+    private void ClearLetters() {
+        foreach (Hexagon hex in AllHexagons) {
+            hex.DeleteLetter();
+        }
+    }
+
+    public void ClearPressedHexagonsInvalidWord() {
+        foreach (Hexagon hex in allHexagons)
         {
-            string[] words = dictionary.text.Split('\n');
-            foreach (string word in words)
+            if (IsHexagonPressed(hex))
             {
-                trie.Insert(word.ToLower().Trim());
+                ClearInvalidHexagon(hex);
             }
         }
     }
 
-    private void InitializeHexagonsOnBoard() {
-        float boardCols = PlayerPrefs.GetInt("BoardCols", 9);
-        float boardRows = PlayerPrefs.GetInt("BoardRows", 11);
-
-        float x = 0;
-        float y = 0;
-
-        for (int i = 0; i < boardRows; i++) {
-            if (i % 2 == 0) {
-                //create short row
-                for (int k = 1; k <= (int)Math.Floor((double)boardCols / 2); k++) {
-                    x = k * Hexagon.HORIZONTALOFFSET * 2;
-                    y = i * Hexagon.VERTICALOFFSET / 2;
-                    Vector3 position = new(x - 350, y - 200);
-                    CreateHexagon(position);
-                }
-            } else {
-                //create long row
-                for (int k = 1; k <= (int)Math.Ceiling((double)boardCols / 2); k++) {
-                    x = k * Hexagon.HORIZONTALOFFSET * 2 - Hexagon.HORIZONTALOFFSET;
-                    y = i * (Hexagon.VERTICALOFFSET / 2);
-                    Vector3 position = new(x - 350, y - 200);
-                    CreateHexagon(position);
-                }
+    private void ClearPressedHexagonsValidWord() {
+        foreach (Hexagon hex in allHexagons)
+        {
+            if (IsHexagonPressed(hex))
+            {
+                ClearHexagon(hex);
             }
-        }    
+        }
     }
 
-    private void CreateHexagon(Vector3 position) {
+    public void ClearWord() {
+        if (!string.IsNullOrWhiteSpace(CurrentWordObjectOnScreen.CurrentWordText.text)) {
+            ResetWordState();
+            audioClearWord.Play();
+            ClearPressedHexagonsInvalidWord();
+            ProcessGlowingHexagons();
+        }
+    }
+
+    public void CreateHexagon(Vector3 position) {
         GameObject newHexagonObject = Instantiate(hexagonPrefab, boardTransform);
         newHexagonObject.transform.SetLocalPositionAndRotation(position, Quaternion.identity);
         Hexagon newHexagon = newHexagonObject.GetComponent<Hexagon>();
@@ -196,21 +247,30 @@ public class Board : MonoBehaviour
         newHexagon.HexagonY = position.y;
     }
 
-    public void PlayAgain() {
-        winnerBlock.SetActive(false);
-        playAgainButton.gameObject.SetActive(false);
-        quitButton.gameObject.SetActive(false);
-        ClearLetters();
-        MakeAllHexagonsInvisible();
-        SetHomeBases();
-        ProcessGlowingHexagons();
-        Team1Turn = true;
+    private HexagonStates GetCurrentTeam() {
+        if (Team1Turn) {
+            return PressedTeam1;
+        } else {
+            return PressedTeam2;
+        }
     }
 
-    private void ClearLetters() {
-        foreach (Hexagon hex in AllHexagons) {
-            hex.DeleteLetter();
+    private string GetOpponentHomeState(string hexState) {
+        return team1Turn ? "homeTeam2" : "homeTeam1";
+    }
+
+    private void HasWon() {
+        bonusReminder.SetActive(false);
+        if (!team1Turn) {
+            winnerBlockText.text = "Team 1 has Won!";
+        } else {
+            winnerBlockText.text = "Team 2 has Won!";
         }
+        audioVictory.Play();
+        winnerBlock.SetActive(true);
+        playAgainButton.gameObject.SetActive(true);
+        quitButton.gameObject.SetActive(true);
+        ChangeTurn();
     }
 
     private void InitializeColors() {
@@ -254,6 +314,34 @@ public class Board : MonoBehaviour
         }
     }
 
+    private void InitializeHexagonsOnBoard() {
+        float boardCols = PlayerPrefs.GetInt("BoardCols", 9);
+        float boardRows = PlayerPrefs.GetInt("BoardRows", 11);
+
+        float x = 0;
+        float y = 0;
+
+        for (int i = 0; i < boardRows; i++) {
+            if (i % 2 == 0) {
+                //create short row
+                for (int k = 1; k <= (int)Math.Floor((double)boardCols / 2); k++) {
+                    x = k * Hexagon.HORIZONTALOFFSET * 2;
+                    y = i * Hexagon.VERTICALOFFSET / 2;
+                    Vector3 position = new(x - 350, y - 200);
+                    CreateHexagon(position);
+                }
+            } else {
+                //create long row
+                for (int k = 1; k <= (int)Math.Ceiling((double)boardCols / 2); k++) {
+                    x = k * Hexagon.HORIZONTALOFFSET * 2 - Hexagon.HORIZONTALOFFSET;
+                    y = i * (Hexagon.VERTICALOFFSET / 2);
+                    Vector3 position = new(x - 350, y - 200);
+                    CreateHexagon(position);
+                }
+            }
+        }    
+    }
+
     private void InitilizeComponents() {
         AllHexagons = GetComponentsInChildren<Hexagon>().ToList();
         InitializeWinnerBlock();
@@ -264,126 +352,32 @@ public class Board : MonoBehaviour
         winnerBlockRect.SetAsLastSibling();
     }
 
-    public void ChangeTurn() { 
-        if (Team1Turn){
-            Team1Turn = false;
-        } else{
-            Team1Turn = true;
-        }
+    private void InitializeWordObjectOnScreen() {
+        CurrentWordObjectOnScreen = GameObject.FindGameObjectWithTag("currentWord").GetComponent<CurrentWord>();
     }
 
-    private void CurrentWordUpdate(string letter) {
-        ListOfLettersPressed.Add(letter);
-        string word = string.Join("", ListOfLettersPressed);
-        CurrentWordObjectOnScreen.UpdateCurrentWord(word);
-    }
-
-    private void CurrentWordRemove(string letter){
-        ListOfLettersPressed.Reverse();
-        ListOfLettersPressed.Remove(letter);
-        ListOfLettersPressed.Reverse();
-        string word = string.Join("", ListOfLettersPressed);
-        CurrentWordObjectOnScreen.UpdateCurrentWord(word);
-    }
-
-    private void ClearPressedHexagonsValidWord() {
-        foreach (Hexagon hex in allHexagons)
+    private void LoadDictionary() {
+        TextAsset[] dictionaries = Resources.LoadAll<TextAsset>("collins");
+        foreach (TextAsset dictionary in dictionaries)
         {
-            if (IsHexagonPressed(hex))
+            string[] words = dictionary.text.Split('\n');
+            foreach (string word in words)
             {
-                ClearHexagon(hex);
+                trie.Insert(word.ToLower().Trim());
             }
         }
     }
 
-    private void ClearHexagon(Hexagon hex) {
-        hex.DeleteLetter();
-        hex.SetHexagonState(Neutral);
-    }
+    private void Loadicons(){
+        team1Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>(PlayerPrefs.GetString("team1Icon"));
+        team2Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>(PlayerPrefs.GetString("team2Icon"));
 
-    public void ClearPressedHexagonsInvaildWord() {
-        foreach (Hexagon hex in allHexagons)
-        {
-            if (IsHexagonPressed(hex))
-            {
-                ClearInavlidHexagon(hex);
-            }
+        if (team1Icon.GetComponent<Image>().sprite == null){
+            team1Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>("apple");
         }
-    }
-
-    private void ClearInavlidHexagon(Hexagon hex) {
-        hex.SetHexagonState(Neutral);
-    }
-
-    private void CheckBonusTurn() {
-        if (BonusTurnActive == true) {
-            ChangeTurn();
-            BonusTurnActive = false;
-
+        if (team2Icon.GetComponent<Image>().sprite == null){
+            team2Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>("bee");
         }
-    }
-
-    private void CheckHomesAreSet() {
-        bool noHomeTeam1 = true;
-        bool noHomeTeam2 = true;
-        foreach (Hexagon hex in AllHexagons) {
-            if (hex.HexagonCurrentState == "homeTeam1") {
-                noHomeTeam1 = false;
-            }
-            if (hex.HexagonCurrentState == "homeTeam2") {
-                noHomeTeam2 = false;
-            }
-        }
-        if (noHomeTeam1 == true) {
-            SetNewHome("homeTeam1");
-        }
-        if (noHomeTeam2 == true) {
-            SetNewHome("homeTeam2");
-        }
-    }
-
-    private void CheckBoardIsPlayable() {
-        if (!trie.CanFormValidWord(AllHexagons)) {
-            StartCoroutine(ShufflePopup2Seconds());
-        }
-    }
-
-    private HexagonStates GetCurrentTeam() {
-        if (Team1Turn) {
-            return PressedTeam1;
-        } else {
-            return PressedTeam2;
-        }
-    }
-
-    private string GetOpponentHomeState(string hexState) {
-        return team1Turn ? "homeTeam2" : "homeTeam1";
-    }
-
-    public void HexagonPressed(Hexagon hex) {
-        string hexState = hex.HexagonCurrentState;
-        if (hexState == "neutral") {
-            audioPressed.Play();
-            CurrentWordUpdate(hex.HexagonText.text);
-            hex.SetHexagonState(GetCurrentTeam());
-
-        } else if (hexState == "pressedTeam1" || hexState == "pressedTeam2") {
-            audioUnPressed.Play();
-            CurrentWordRemove(hex.HexagonText.text);
-            hex.SetHexagonState(Neutral);
-
-        } else {
-            //if state is home/territory/invisible then do nothing
-        }
-        ProcessGlowingHexagons();
-    }
-
-    private bool IsHexagonPressed(Hexagon hex) {
-        return hex.HexagonCurrentState == "pressedTeam1" || hex.HexagonCurrentState == "pressedTeam2";
-    }
-
-    private bool IsHomeState(string hexState) {
-        return hexState == "homeTeam1" || hexState == "homeTeam2";
     }
 
     public void LoadMainMenu() {
@@ -440,30 +434,18 @@ public class Board : MonoBehaviour
         }
     }
 
-    private void ProcessValidWord() {
-        foreach (Hexagon hex in AllHexagons)
-        {
-            MakePressedHexagonsTerritory(hex);
-        }
-        Letter.AddLetterToList(CurrentWordObjectOnScreen.CurrentWordText.text);
-        ClearPressedHexagonsValidWord();
-        ChangeTurn();
-        ResetWordState();
-        CheckBoardIsPlayable();
-        CheckHomesAreSet();
-        CheckBonusTurn();
-        audioWordSubmit.Play();
+    private void PlayAgain() {
+        winnerBlock.SetActive(false);
+        playAgainButton.gameObject.SetActive(false);
+        quitButton.gameObject.SetActive(false);
+        ClearLetters();
+        MakeAllHexagonsInvisible();
+        SetHomeBases();
         ProcessGlowingHexagons();
-        CheckAutoShuffle();
+        Team1Turn = true;
     }
 
-    private void ProcessInvalidWord() {
-        ClearPressedHexagonsInvaildWord();
-        ResetWordState();
-        audioWordFailed.Play();
-    }
-
-    public void ProcessGlowingHexagons() {
+    private void ProcessGlowingHexagons() {
         foreach (Hexagon hex in AllHexagons)
         {
             bool isTeam1Hex = hex.HexagonCurrentState == "territoryTeam1" || hex.HexagonCurrentState == "homeTeam1";
@@ -509,32 +491,68 @@ public class Board : MonoBehaviour
         MakePressedHexagonsTerritory(touchingHex);
     }
 
+    private void ProcessValidWord() {
+        foreach (Hexagon hex in AllHexagons)
+        {
+            MakePressedHexagonsTerritory(hex);
+        }
+        Letter.AddLetterToList(CurrentWordObjectOnScreen.CurrentWordText.text);
+        ClearPressedHexagonsValidWord();
+        ChangeTurn();
+        ResetWordState();
+        CheckBoardIsPlayable();
+        CheckHomesAreSet();
+        CheckBonusTurn();
+        audioWordSubmit.Play();
+        ProcessGlowingHexagons();
+        CheckAutoShuffle();
+    }
+
+    private void ProcessInvalidWord() {
+        ClearPressedHexagonsInvalidWord();
+        ResetWordState();
+        audioWordFailed.Play();
+    }
+
     public void ResetWordState() {
         CurrentWordObjectOnScreen.UpdateCurrentWord("");
         ListOfLettersPressed.Clear();
     }
 
-    private void SetHomeBases() {
+    public void SubmitButtonPressed() {
 
-        //the math only works if there are two more rows than columns in the board eg. 7 cols and 9 rows
-        int boardCols = PlayerPrefs.GetInt("BoardCols", 9);
-        int base1, base2;
+        if (trie.Search(CurrentWordObjectOnScreen.CurrentWordText.text.ToLower()))
+        {
+            ProcessValidWord();
+        }
+        else
+        {
+            ProcessInvalidWord();
+        }
+    }
 
-        int halfBoardColsRoundedUp = (int)Math.Ceiling((double)boardCols / 2);
-        int halfBoardColsRoundedDown = (int)Math.Floor((double)boardCols / 2);
-        int totalHexes = halfBoardColsRoundedUp * halfBoardColsRoundedUp * 2;
+    private bool ShouldMakeNeutralForTeam1(string hexState) {
+        return hexState != "homeTeam1" && hexState != "territoryTeam1" && hexState != "pressedTeam1";
+    }
 
-        base1 = boardCols + halfBoardColsRoundedDown;
-        base2 = totalHexes - base1;
+    private bool ShouldMakeNeutralForTeam2(string hexState) {
+        return hexState != "homeTeam2" && hexState != "territoryTeam2" && hexState != "pressedTeam2";
+    }
 
-        AllHexagons[base1 - 1].SetHexagonState(HomeTeam1);
-        AllHexagons[base2 - 1].SetHexagonState(HomeTeam2);
+    private void ShuffleLetters() {
+        foreach (Hexagon hex in AllHexagons) {
+            if (hex.HexagonCurrentState == "neutral") {
+                hex.SetLetter();
+            }
+        }
+        Debug.Log("SHUFFLING");
+        CheckBoardIsPlayable();
+    }
 
-        team1Icon.SetActive(true);
-        team2Icon.SetActive(true);
-
-        team1Icon.transform.position = new Vector2(AllHexagons[base1 - 1].HexagonX / 108f, AllHexagons[base1 - 1].HexagonY / 108f);
-        team2Icon.transform.position = new Vector2(AllHexagons[base2 - 1].HexagonX / 108f, AllHexagons[base2 - 1].HexagonY / 108f);
+    private void UpdateTeamIconPosition(Hexagon hex, string team) {
+        GameObject teamIcon = team == "homeTeam2" ? team2Icon : team1Icon;
+        teamIcon.SetActive(true);
+        teamIcon.transform.position = new Vector2(hex.HexagonX / 108f, hex.HexagonY / 108f);
     }
 
     private void SetCameraZoom() {
@@ -562,34 +580,32 @@ public class Board : MonoBehaviour
         Camera.main.transform.Translate(camMove);
     }
 
-    public void SubmitButtonPressed() {
+    private void SetHomeBases() {
 
-        if (trie.Search(CurrentWordObjectOnScreen.CurrentWordText.text.ToLower()))
-        {
-            ProcessValidWord();
-        }
-        else
-        {
-            ProcessInvalidWord();
-        }
+        //the math only works if there are two more rows than columns in the board eg. 7 cols and 9 rows
+        int boardCols = PlayerPrefs.GetInt("BoardCols", 9);
+        int base1, base2;
+
+        int halfBoardColsRoundedUp = (int)Math.Ceiling((double)boardCols / 2);
+        int halfBoardColsRoundedDown = (int)Math.Floor((double)boardCols / 2);
+        int totalHexes = halfBoardColsRoundedUp * halfBoardColsRoundedUp * 2;
+
+        base1 = boardCols + halfBoardColsRoundedDown;
+        base2 = totalHexes - base1;
+
+        AllHexagons[base1 - 1].SetHexagonState(HomeTeam1);
+        AllHexagons[base2 - 1].SetHexagonState(HomeTeam2);
+
+        team1Icon.SetActive(true);
+        team2Icon.SetActive(true);
+
+        team1Icon.transform.position = new Vector2(AllHexagons[base1 - 1].HexagonX / 108f, AllHexagons[base1 - 1].HexagonY / 108f);
+        team2Icon.transform.position = new Vector2(AllHexagons[base2 - 1].HexagonX / 108f, AllHexagons[base2 - 1].HexagonY / 108f);
     }
 
-    private void ShuffleLetters() {
-        foreach (Hexagon hex in AllHexagons) {
-            if (hex.HexagonCurrentState == "neutral") {
-                hex.SetLetter();
-            }
-        }
-        Debug.Log("SHUFFLING");
-        CheckBoardIsPlayable();
-    }
-
-    private bool ShouldMakeNeutralForTeam1(string hexState) {
-        return hexState != "homeTeam1" && hexState != "territoryTeam1" && hexState != "pressedTeam1";
-    }
-
-    private bool ShouldMakeNeutralForTeam2(string hexState) {
-        return hexState != "homeTeam2" && hexState != "territoryTeam2" && hexState != "pressedTeam2";
+    private void SetHexagonStateForTeam(Hexagon hex, string team) {
+        HexagonStates homeTeam = team == "homeTeam2" ? HomeTeam2 : HomeTeam1;
+        hex.SetHexagonState(homeTeam);
     }
 
     private void SetNewHome(string team) {
@@ -602,18 +618,6 @@ public class Board : MonoBehaviour
         }
     }
 
-    private void SetHexagonStateForTeam(Hexagon hex, string team) {
-        HexagonStates homeTeam = team == "homeTeam2" ? HomeTeam2 : HomeTeam1;
-        hex.SetHexagonState(homeTeam);
-    }
-
-    private void UpdateTeamIconPosition(Hexagon hex, string team) {
-        GameObject teamIcon = team == "homeTeam2" ? team2Icon : team1Icon;
-        teamIcon.SetActive(true);
-        teamIcon.transform.position = new Vector2(hex.HexagonX / 108f, hex.HexagonY / 108f);
-    }
-
-
     private Hexagon SelectRandomHexagonOfType(string state){
         List<Hexagon> targetHexes = AllHexagons.Where(hex => hex.HexagonCurrentState == state).ToList();
         if (targetHexes.Count == 0) {
@@ -624,52 +628,50 @@ public class Board : MonoBehaviour
         }
     }
 
-    private void HasWon() {
-        bonusReminder.SetActive(false);
-        if (!team1Turn) {
-            winnerBlockText.text = "Team 1 has Won!";
-        } else {
-            winnerBlockText.text = "Team 2 has Won!";
-        }
-        audioVictory.Play();
-        winnerBlock.SetActive(true);
-        playAgainButton.gameObject.SetActive(true);
-        quitButton.gameObject.SetActive(true);
-        ChangeTurn();
-    }
-
-    public void ClearWord() {
-        if (!string.IsNullOrWhiteSpace(CurrentWordObjectOnScreen.CurrentWordText.text)) {
-            ResetWordState();
-            audioClearWord.Play();
-            ClearPressedHexagonsInvaildWord();
-            ProcessGlowingHexagons();
-        }
-    }
-
-    void Update() {
-        if (Input.GetMouseButtonDown(1)) {
-            ClearWord();
-        }
-    }
-
-    void CheckAutoShuffle() {
-        if (shuffleCounter < 10)
-        {
-            shuffleCounter += 1;
-        } else {
-            StartCoroutine(ShufflePopup2Seconds());
-            shuffleCounter = 0;
-        }
-        
-    }
-
     IEnumerator ShufflePopup2Seconds() {
         autoShufflePopup.SetActive(true);
         yield return new WaitForSeconds(2);
         ShuffleLetters();
         autoShufflePopup.SetActive(false);
     }
+
+    private void CurrentWordRemove(string letter){
+        ListOfLettersPressed.Reverse();
+        ListOfLettersPressed.Remove(letter);
+        ListOfLettersPressed.Reverse();
+        string word = string.Join("", ListOfLettersPressed);
+        CurrentWordObjectOnScreen.UpdateCurrentWord(word);
+    }
+
+    private void CurrentWordUpdate(string letter) {
+        ListOfLettersPressed.Add(letter);
+        string word = string.Join("", ListOfLettersPressed);
+        CurrentWordObjectOnScreen.UpdateCurrentWord(word);
+    }
+
+    public void HexagonPressed(Hexagon hex) {
+        string hexState = hex.HexagonCurrentState;
+        if (hexState == "neutral") {
+            audioPressed.Play();
+            CurrentWordUpdate(hex.HexagonText.text);
+            hex.SetHexagonState(GetCurrentTeam());
+
+        } else if (hexState == "pressedTeam1" || hexState == "pressedTeam2") {
+            audioUnPressed.Play();
+            CurrentWordRemove(hex.HexagonText.text);
+            hex.SetHexagonState(Neutral);
+
+        } else {
+            //if state is home/territory/invisible then do nothing
+        }
+        ProcessGlowingHexagons();
+    }
+
+    private bool IsHexagonPressed(Hexagon hex) {
+        return hex.HexagonCurrentState == "pressedTeam1" || hex.HexagonCurrentState == "pressedTeam2";
+    }
+
+    private bool IsHomeState(string hexState) {
+        return hexState == "homeTeam1" || hexState == "homeTeam2";
+    }
 }
-
-
