@@ -9,7 +9,7 @@ using System.Collections;
 
 public class Board : MonoBehaviour
 {
-    
+
     // Hexagon States   
 
     [SerializeField]
@@ -152,7 +152,7 @@ public class Board : MonoBehaviour
         }
     }
 
-    private void CheckAutoShuffle() {
+    private void CheckIfAllLettersOnBoardShouldBeShuffled() {
         if (shuffleCounter < 10) {
             shuffleCounter += 1;
         } else {
@@ -351,10 +351,6 @@ public class Board : MonoBehaviour
         winnerBlockRect.SetAsLastSibling();
     }
 
-    private void InitializeWordObjectOnScreen() {
-        CurrentWordObjectOnScreen = GameObject.FindGameObjectWithTag("currentWord").GetComponent<CurrentWord>();
-    }
-
     private void LoadDictionary() {
         TextAsset[] dictionaries = Resources.LoadAll<TextAsset>("collins");
         foreach (TextAsset dictionary in dictionaries)
@@ -504,7 +500,7 @@ public class Board : MonoBehaviour
         CheckBonusTurn();
         audioWordSubmit.Play();
         ProcessGlowingHexagons();
-        CheckAutoShuffle();
+        CheckIfAllLettersOnBoardShouldBeShuffled();
     }
 
     private void ProcessInvalidWord() {
@@ -634,7 +630,7 @@ public class Board : MonoBehaviour
         autoShufflePopup.SetActive(false);
     }
 
-    private void CurrentWordRemove(string letter){
+    private void CurrentWordRemoveMostRecentLetter(string letter){
         ListOfLettersPressed.Reverse();
         ListOfLettersPressed.Remove(letter);
         ListOfLettersPressed.Reverse();
@@ -642,7 +638,7 @@ public class Board : MonoBehaviour
         CurrentWordObjectOnScreen.UpdateCurrentWord(word);
     }
 
-    private void CurrentWordUpdate(string letter) {
+    private void CurrentWordAddNewLetter(string letter) {
         ListOfLettersPressed.Add(letter);
         string word = string.Join("", ListOfLettersPressed);
         CurrentWordObjectOnScreen.UpdateCurrentWord(word);
@@ -652,12 +648,12 @@ public class Board : MonoBehaviour
         string hexState = hex.HexagonCurrentState;
         if (hexState == "neutral") {
             audioPressed.Play();
-            CurrentWordUpdate(hex.HexagonText.text);
+            CurrentWordAddNewLetter(hex.HexagonText.text);
             hex.SetHexagonState(GetCurrentTeam());
 
         } else if (hexState == "pressedTeam1" || hexState == "pressedTeam2") {
             audioUnPressed.Play();
-            CurrentWordRemove(hex.HexagonText.text);
+            CurrentWordRemoveMostRecentLetter(hex.HexagonText.text);
             hex.SetHexagonState(Neutral);
 
         } else {
