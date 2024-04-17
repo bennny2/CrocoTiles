@@ -55,7 +55,7 @@ class Trie
 
             foreach (string potentialWord in permutations) {
                 if (Search(potentialWord)) {
-                    Debug.Log(potentialWord);
+                    //Debug.Log(potentialWord);
                     return true;
                 }
             }

@@ -42,8 +42,7 @@ public static class Letter
 
     // Class Methods
 
-    public static void AddLetterToAvailableLettersPool(string word) {
-        DeleteLetterFromInPlayLettersPool(word);
+    public static void AddLettersToAvailableLettersPool(string word) {
         List<char> charList = word.ToCharArray().ToList();
         foreach (char letter in charList) {
             availableLettersPool.Add(letter);
@@ -56,7 +55,6 @@ public static class Letter
 
     private static bool CheckForLetterRestrictions(char letterCandidate) {
 
-        
         int totalLetters = inPlayLettersPool.Count;
 
         if (totalLetters < 4) {
@@ -95,13 +93,34 @@ public static class Letter
         if (totalLetters < 25 && amountOfThatLetterInPlay > 4) {
             return false;
         }
-        if (totalVowels / totalLetters > 0.6f) {
+        
+        bool tooManyVowels = totalVowels / totalLetters > 0.6f;
+        bool tooManyConsonants = totalConsonants / totalLetters > 0.8f;
+
+        string allLetters = "";
+        foreach (char letterX in inPlayLettersPool)
+        {
+            allLetters += letterX;
+        }
+
+        UnityEngine.Debug.Log(allLetters);
+
+
+        /*
+        UnityEngine.Debug.Log("totalVowels = " + totalVowels);
+        UnityEngine.Debug.Log("totalConsonants = " + totalConsonants);
+        UnityEngine.Debug.Log("totalLetters = " + totalLetters);
+
+        UnityEngine.Debug.Log("tooManyVowels = " + tooManyVowels);
+        UnityEngine.Debug.Log("tooManyConsonants = " + tooManyConsonants);
+        */
+
+        if (tooManyVowels) {
             return false;
-        }      
-        if (totalConsonants / totalLetters > 0.75f) {
+        } else if (tooManyConsonants) {
             return false;
         }
-        
+        //UnityEngine.Debug.Log("totalLetters = " + totalLetters);
         return true;
     }
 
@@ -114,13 +133,15 @@ public static class Letter
         }
     }
 
-    public static void DeleteLetterFromInPlayLettersPool(string word) {
-        char letter = StringToLetter(word);
-        for (int i = 0; i < inPlayLettersPool.Count; i++) {
+    public static void DeleteLettersFromInPlayLettersPool(string word) {
+        List<char> charList = word.ToCharArray().ToList();
+        foreach (char letter in charList) {
+            for (int i = 0; i < inPlayLettersPool.Count; i++) {
             if (inPlayLettersPool[i] == letter) {
                 inPlayLettersPool.RemoveAt(i);
-                return;
+                break;
             }
+        }
         }
     }
 

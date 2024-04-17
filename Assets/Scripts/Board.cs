@@ -524,11 +524,12 @@ public class Board : MonoBehaviour
     }
 
     private void ProcessValidWord() {
+        Letter.DeleteLettersFromInPlayLettersPool(CurrentWordObjectOnScreen.CurrentWordText.text);
         foreach (Hexagon hex in AllHexagons)
         {
             MakePressedHexagonsTerritory(hex);
         }
-        Letter.AddLetterToAvailableLettersPool(CurrentWordObjectOnScreen.CurrentWordText.text);
+        Letter.AddLettersToAvailableLettersPool(CurrentWordObjectOnScreen.CurrentWordText.text);
         ClearPressedHexagonsValidWord();
         ChangeTurn();
         ResetWordState();
