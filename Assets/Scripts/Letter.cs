@@ -54,10 +54,9 @@ public static class Letter
     }
 
     private static bool CheckForLetterRestrictions(char letterCandidate) {
-
         int totalLetters = inPlayLettersPool.Count;
 
-        if (totalLetters < 4) {
+        if (totalLetters < 3) {
             return true;
         }
 
@@ -97,29 +96,11 @@ public static class Letter
         bool tooManyVowels = totalVowels / totalLetters > 0.6f;
         bool tooManyConsonants = totalConsonants / totalLetters > 0.8f;
 
-        string allLetters = "";
-        foreach (char letterX in inPlayLettersPool)
-        {
-            allLetters += letterX;
-        }
-
-        UnityEngine.Debug.Log(allLetters);
-
-        UnityEngine.Debug.Log("totalVowels = " + totalVowels);
-        UnityEngine.Debug.Log("totalConsonants = " + totalConsonants);
-        UnityEngine.Debug.Log("totalLetters = " + totalLetters);
-
-        UnityEngine.Debug.Log("tooManyVowels = " + tooManyVowels);
-        UnityEngine.Debug.Log("tooManyConsonants = " + tooManyConsonants);
-        
         if (tooManyVowels) {
             return false;
         } else if (tooManyConsonants) {
             return false;
         }
-
-        UnityEngine.Debug.Log("totalLetters = " + totalLetters);
-
         return true;
     }
 
