@@ -23,6 +23,14 @@ public class SettingsBoard : MonoBehaviour
     private GameObject team1IconShowcase;
     [SerializeField]
     private GameObject team2IconShowcase;
+    [SerializeField]
+    private GameObject pointer;
+    [SerializeField]
+    private GameObject smallBoardButton;
+    [SerializeField]
+    private GameObject mediumBoardButton;
+    [SerializeField]
+    private GameObject largeBoardButton;
 
     // Fields
 
@@ -48,6 +56,7 @@ public class SettingsBoard : MonoBehaviour
 
     void Start() {
         InitializeColors();
+        SetInitialPointerLocation();
     }
 
     public void ApplySettings() {
@@ -102,6 +111,7 @@ public class SettingsBoard : MonoBehaviour
 
     public void LargeBoard() {
         SelectedBoardSize = "large";
+        SetNewPointerLocation("large");
         chooseSettingsNoise.Play();
         unsavedChanges = true;
     }
@@ -192,6 +202,7 @@ public class SettingsBoard : MonoBehaviour
 
     public void MediumBoard() {
         SelectedBoardSize = "medium";
+        SetNewPointerLocation("medium");
         chooseSettingsNoise.Play();
         unsavedChanges = true;
     }
@@ -240,7 +251,39 @@ public class SettingsBoard : MonoBehaviour
 
     public void SmallBoard() {
         SelectedBoardSize = "small";
+        SetNewPointerLocation("small");
         chooseSettingsNoise.Play();
         unsavedChanges = true;
+    }
+
+    private void SetInitialPointerLocation() {
+        switch (PlayerPrefs.GetInt("BoardCols", 9)) 
+        {
+            case 7:
+                pointer.transform.position = smallBoardButton.transform.position;
+                break;
+            case 9:
+                pointer.transform.position = mediumBoardButton.transform.position;
+                break;
+            case 11:
+                pointer.transform.position = largeBoardButton.transform.position;
+                break;
+        }
+        pointer.transform.Translate(new Vector3(0, 80, 0));
+    }
+    private void SetNewPointerLocation(string boardSize) {
+        switch (boardSize) 
+        {
+            case "small":
+                pointer.transform.position = smallBoardButton.transform.position;
+                break;
+            case "medium":
+                pointer.transform.position = mediumBoardButton.transform.position;
+                break;
+            case "large":
+                pointer.transform.position = largeBoardButton.transform.position;
+                break;
+        }
+        pointer.transform.Translate(new Vector3(0, 80, 0));
     }
 }
