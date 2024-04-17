@@ -98,9 +98,9 @@ public static class Letter
 
         if (tooManyVowels) {
             return false;
-        } else if (tooManyConsonants) {
-            return false;
-        }
+        } //else if (tooManyConsonants) {
+            //return false;
+        //}
         return true;
     }
 
