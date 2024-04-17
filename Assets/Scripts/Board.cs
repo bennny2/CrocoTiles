@@ -647,6 +647,17 @@ public class Board : MonoBehaviour
         }
         Debug.Log("SHUFFLING");
         CheckBoardIsPlayable();
+        FindAllLettersOnBoardToUpdateInPlayLettersPool();
+    }
+
+    private void FindAllLettersOnBoardToUpdateInPlayLettersPool() {
+        string newLettersAfterShuffle = "";
+        foreach (Hexagon hex in AllHexagons) {
+            if (!string.IsNullOrWhiteSpace(hex.HexagonText.text)) {
+                newLettersAfterShuffle += hex.HexagonText.text;
+            }
+        }
+        Letter.UpdateInPlayLettersPoolAfterShuffle(newLettersAfterShuffle);
     }
 
     public void SubmitButtonPressed() {

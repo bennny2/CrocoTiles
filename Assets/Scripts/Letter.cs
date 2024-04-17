@@ -8,7 +8,7 @@ public static class Letter
     // Fields
 
     private static readonly Random random = new();
-    private static readonly List<char> inPlayLettersPool = new();
+    private static List<char> inPlayLettersPool = new();
     private static List<char> availableLettersPool = new();
     private static readonly List<char> availableLettersPoolTemplate = new()
     {
@@ -105,22 +105,21 @@ public static class Letter
 
         UnityEngine.Debug.Log(allLetters);
 
-
-        /*
         UnityEngine.Debug.Log("totalVowels = " + totalVowels);
         UnityEngine.Debug.Log("totalConsonants = " + totalConsonants);
         UnityEngine.Debug.Log("totalLetters = " + totalLetters);
 
         UnityEngine.Debug.Log("tooManyVowels = " + tooManyVowels);
         UnityEngine.Debug.Log("tooManyConsonants = " + tooManyConsonants);
-        */
-
+        
         if (tooManyVowels) {
             return false;
         } else if (tooManyConsonants) {
             return false;
         }
-        //UnityEngine.Debug.Log("totalLetters = " + totalLetters);
+
+        UnityEngine.Debug.Log("totalLetters = " + totalLetters);
+
         return true;
     }
 
@@ -162,11 +161,7 @@ public static class Letter
         availableLettersPool = new List<char>(availableLettersPoolTemplate);
     }
 
-    public static char StringToLetter(string word) {
-        List<char> charList = word.ToCharArray().ToList();
-        foreach (char letter in charList) {
-            return letter;
-        }
-        return '5'; //ignore, removes error, will never reach this code
+    public static void UpdateInPlayLettersPoolAfterShuffle(string newLetters) {
+        inPlayLettersPool =  new List<char>(newLetters.ToCharArray());
     }
 }
