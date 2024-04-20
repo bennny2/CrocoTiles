@@ -458,7 +458,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 751dda1ce7a24524b97445e1e552b428, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentWordText: {fileID: 0}
+  _currentWordText: {fileID: 0}
 --- !u!1 &371928257
 GameObject:
   m_ObjectHideFlags: 0
@@ -1054,48 +1054,48 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2993373ac6216c2439067c6320b5d7ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  homeTeam1:
-    fillColor: {r: 0.0038714937, g: 0.2773112, b: 0.8207547, a: 1}
-    stateName: homeTeam1
-  homeTeam2:
-    fillColor: {r: 0.9811321, g: 0.3997324, b: 0.0509078, a: 1}
-    stateName: homeTeam2
-  invisible:
-    fillColor: {r: 0, g: 0, b: 0, a: 0}
-    stateName: invisible
-  neutral:
-    fillColor: {r: 0.6886792, g: 0.6886792, b: 0.6886792, a: 1}
-    stateName: neutral
-  pressedTeam1:
-    fillColor: {r: 0.3537736, g: 0.53103495, b: 1, a: 1}
-    stateName: pressedTeam1
-  pressedTeam2:
-    fillColor: {r: 0.9716981, g: 0.5748771, b: 0.40792987, a: 1}
-    stateName: pressedTeam2
-  territoryTeam1:
-    fillColor: {r: 0.19339621, g: 0.3003279, b: 1, a: 1}
-    stateName: territoryTeam1
-  territoryTeam2:
-    fillColor: {r: 1, g: 0.50616753, b: 0.16509432, a: 1}
-    stateName: territoryTeam2
-  audioClearWord: {fileID: 576466928}
-  audioPressed: {fileID: 576466922}
-  audioUnPressed: {fileID: 576466923}
-  audioWordSubmit: {fileID: 576466926}
-  audioWordFailed: {fileID: 576466925}
-  audioVictory: {fileID: 576466927}
-  chooseSettingsNoise: {fileID: 576466924}
-  playAgainButton: {fileID: 1094377256}
-  quitButton: {fileID: 385833785}
-  winnerBlock: {fileID: 1184568875}
-  hexagonPrefab: {fileID: 3937737225052901753, guid: b6ccbbfcb0a28c544b9d2322c1603e46, type: 3}
-  boardTransform: {fileID: 576466920}
-  currentWordObjectOnScreen: {fileID: 352126768}
-  winnerBlockText: {fileID: 1838990286}
-  team1Icon: {fileID: 1758354099}
-  team2Icon: {fileID: 167844980}
-  bonusReminder: {fileID: 187401541}
-  autoShufflePopup: {fileID: 1508420987}
+  _homeTeam1:
+    _fillColor: {r: 0, g: 0.19104338, b: 1, a: 1}
+    _stateName: homeTeam1
+  _homeTeam2:
+    _fillColor: {r: 1, g: 0.42267352, b: 0, a: 1}
+    _stateName: homeTeam2
+  _invisible:
+    _fillColor: {r: 0, g: 0, b: 0, a: 0}
+    _stateName: invisible
+  _neutral:
+    _fillColor: {r: 0.9433962, g: 0.91081774, b: 0.89444643, a: 1}
+    _stateName: neutral
+  _pressedTeam1:
+    _fillColor: {r: 0.2971698, g: 0.59888965, b: 1, a: 1}
+    _stateName: pressedTeam1
+  _pressedTeam2:
+    _fillColor: {r: 1, g: 0.6427089, b: 0.3066038, a: 1}
+    _stateName: pressedTeam2
+  _territoryTeam1:
+    _fillColor: {r: 0.1745283, g: 0.29964018, b: 1, a: 1}
+    _stateName: territoryTeam1
+  _territoryTeam2:
+    _fillColor: {r: 1, g: 0.5838552, b: 0.11792451, a: 1}
+    _stateName: territoryTeam2
+  _audioClearWord: {fileID: 576466928}
+  _audioPressed: {fileID: 576466922}
+  _audioUnPressed: {fileID: 576466923}
+  _audioWordSubmit: {fileID: 576466926}
+  _audioWordFailed: {fileID: 576466925}
+  _audioVictory: {fileID: 576466927}
+  _chooseSettingsNoise: {fileID: 576466924}
+  _playAgainButton: {fileID: 1094377256}
+  _quitButton: {fileID: 385833785}
+  _winnerBlock: {fileID: 1184568875}
+  _hexagonPrefab: {fileID: 3937737225052901753, guid: b6ccbbfcb0a28c544b9d2322c1603e46, type: 3}
+  _boardTransform: {fileID: 576466920}
+  _currentWordObjectOnScreen: {fileID: 352126768}
+  _winnerBlockText: {fileID: 1838990286}
+  _team1Icon: {fileID: 1758354099}
+  _team2Icon: {fileID: 167844980}
+  _bonusReminder: {fileID: 187401541}
+  _autoShufflePopup: {fileID: 1508420987}
 --- !u!82 &576466922
 AudioSource:
   m_ObjectHideFlags: 0

@@ -2118,19 +2118,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9daa7b5699f4d14fa095f92efd02e27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  applySettingsNoise: {fileID: 993669441}
-  chooseSettingsNoise: {fileID: 993669443}
-  mainMenuNoise: {fileID: 993669442}
-  colorResultTeam1: {fileID: 577424469}
-  colorResultTeam2: {fileID: 1696004436}
-  unsavedPopup: {fileID: 1463714702}
-  team1IconShowcase: {fileID: 1586835456}
-  team2IconShowcase: {fileID: 2105225770}
-  pointer: {fileID: 745696691}
-  smallBoardButton: {fileID: 1077293772}
-  mediumBoardButton: {fileID: 106792544}
-  largeBoardButton: {fileID: 542614342}
-  unsavedChanges: 0
+  _applySettingsNoise: {fileID: 993669441}
+  _chooseSettingsNoise: {fileID: 993669443}
+  _mainMenuNoise: {fileID: 993669442}
+  _colorResultTeam1: {fileID: 577424469}
+  _colorResultTeam2: {fileID: 1696004436}
+  _unsavedPopup: {fileID: 1463714702}
+  _team1IconShowcase: {fileID: 1586835456}
+  _team2IconShowcase: {fileID: 2105225770}
+  _pointer: {fileID: 745696691}
+  _smallBoardButton: {fileID: 1077293772}
+  _mediumBoardButton: {fileID: 106792544}
+  _largeBoardButton: {fileID: 542614342}
 --- !u!82 &993669441
 AudioSource:
   m_ObjectHideFlags: 0
