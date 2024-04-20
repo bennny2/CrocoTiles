@@ -6,23 +6,23 @@ public class HexagonStates
     // Fields
 
     [SerializeField]
-    private Color fillColor;
+    private Color _fillColor;
 
     [SerializeField]
-    private string stateName;
+    private string _stateName;
 
     // Properties
     
     public Color FillColor 
     {
-        get => fillColor;
-        set => fillColor = value;
+        get => _fillColor;
+        set => _fillColor = value;
     }
 
     public string StateName
     {
-        get => stateName;
-        set => stateName = value;
+        get => _stateName;
+        set => _stateName = value;
 
     } 
 }

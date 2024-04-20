@@ -6,11 +6,11 @@ public class CurrentWord : MonoBehaviour
     // Serialized Fields
 
     [SerializeField]
-    private TextMeshProUGUI currentWordText;
+    private TextMeshProUGUI _currentWordText;
 
     // Properties
 
-    public TextMeshProUGUI CurrentWordText => currentWordText;
+    public TextMeshProUGUI CurrentWordText => _currentWordText;
 
     // Class Methods
 
@@ -19,8 +19,8 @@ public class CurrentWord : MonoBehaviour
     }
 
     private void InitializeComponents() {
-        currentWordText = GetComponentInChildren<TextMeshProUGUI>();
-        if (currentWordText == null) {
+        _currentWordText = GetComponentInChildren<TextMeshProUGUI>();
+        if (_currentWordText == null) {
             Debug.LogError("TextMeshProUGUI component not found in children.", this);
         }
     }

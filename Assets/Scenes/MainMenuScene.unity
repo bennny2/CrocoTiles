@@ -1476,24 +1476,38 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Welcome To CrocoTiles!
+  m_text: '(WORK IN PROGRESS)
+
+    Welcome To CrocoTiles!
 
 
+    Instructions:
 
-    Your goal is to eliminate all of your opponents
-    tiles by taking turns using the letters in the neutral tiles to create words
-    and expand your territory.
+    -
+    When it''s your turn, make words using the available letters
+
+    - Valid words
+    will turn the letters used into your territory!
+
+    - Using letters adjacent
+    to your opponents territory will destroy it!
+
+    - Destroy your opponents base
+    to gain an extra turn
+
+    - Destroy all of you opponents territory to win!
 
 
-    Make words using neutral tiles to add them to
-    your territory and destroy any opponents adjacent territory! Keep in mind any
-    neutral tiles can be used to make a word, but only tiles that connect to your
-    home base will affect your opponents territory and become your own territory.
+    Rules:
 
+    -
+    Must be a valid English word
 
-    Destroying
-    the opponents base grants you an extra turn! Use the bonus turn to try to clean
-    up all of their remaining territory to win!'
+    - Only letters that connect to your pre-existing
+    territory will become new territory when played
+
+    - After the bonus turn from
+    taking a base, the taken base will reappear and replace a random territory'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

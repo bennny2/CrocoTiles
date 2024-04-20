@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 class TrieNode
 {
 
-    // Fields
+    // Properties
     
     public TrieNode[] Children { get; } = new TrieNode[26]; 
     public bool IsEndOfWord { get; set; }
@@ -26,13 +25,17 @@ class Trie
 
     // Fields
 
-    private readonly TrieNode root;
+    private readonly TrieNode _root;
+
+    // Properties
+
+    internal TrieNode Root => _root;
 
     // Constructor
 
     public Trie()
     {
-        root = new TrieNode();
+        _root = new TrieNode();
     }
 
     // Class Methods
@@ -64,7 +67,7 @@ class Trie
     }
 
     public void Insert(string word) {
-        TrieNode node = root;
+        TrieNode node = Root;
         foreach (char c in word)
         {
             int index = c - 'a';
@@ -81,7 +84,7 @@ class Trie
     }
 
     private TrieNode SearchPrefix(string word) {
-        TrieNode node = root;
+        TrieNode node = Root;
         foreach (char c in word)
         {
             int index = c - 'a';

@@ -8,47 +8,47 @@ public class SettingsBoard : MonoBehaviour
     // Serialized Fields
 
     [SerializeField]
-    private AudioSource applySettingsNoise;
+    private AudioSource _applySettingsNoise;
     [SerializeField]
-    private AudioSource chooseSettingsNoise;
+    private AudioSource _chooseSettingsNoise;
     [SerializeField]
-    private AudioSource mainMenuNoise;
+    private AudioSource _mainMenuNoise;
     [SerializeField]
-    private Image colorResultTeam1;
+    private Image _colorResultTeam1;
     [SerializeField]
-    private Image colorResultTeam2;
+    private Image _colorResultTeam2;
     [SerializeField]
-    private GameObject unsavedPopup;
+    private GameObject _unsavedPopup;
     [SerializeField]
-    private GameObject team1IconShowcase;
+    private GameObject _team1IconShowcase;
     [SerializeField]
-    private GameObject team2IconShowcase;
+    private GameObject _team2IconShowcase;
     [SerializeField]
-    private GameObject pointer;
+    private GameObject _pointer;
     [SerializeField]
-    private GameObject smallBoardButton;
+    private GameObject _smallBoardButton;
     [SerializeField]
-    private GameObject mediumBoardButton;
+    private GameObject _mediumBoardButton;
     [SerializeField]
-    private GameObject largeBoardButton;
+    private GameObject _largeBoardButton;
 
     // Fields
 
-    public bool unsavedChanges = false;
-    private string currentTeam1Icon;
-    private string currentTeam2Icon;
+    public bool _unsavedChanges = false;
+    private string _currentTeam1Icon;
+    private string _currentTeam2Icon;
 
     // Properties 
 
     public Image ColorResultTeam1
     {
-        get => colorResultTeam1;
-        set => colorResultTeam1 = value;
+        get => _colorResultTeam1;
+        set => _colorResultTeam1 = value;
     }
     public Image ColorResultTeam2
     {
-        get => colorResultTeam2;
-        set => colorResultTeam2 = value;
+        get => _colorResultTeam2;
+        set => _colorResultTeam2 = value;
     }
     public string SelectedBoardSize { get; private set; }
 
@@ -64,15 +64,15 @@ public class SettingsBoard : MonoBehaviour
         SaveBoardSize();
         SaveIcon();
         PlayerPrefs.Save();
-        unsavedChanges = false;
-        applySettingsNoise.Play();
+        _unsavedChanges = false;
+        _applySettingsNoise.Play();
     }
 
     public void AttemptToCloseSettings() {
-        if (unsavedChanges == false){
+        if (_unsavedChanges == false){
             LoadMenuScene();
         } else{
-            unsavedPopup.SetActive(true);
+            _unsavedPopup.SetActive(true);
         }
     }
 
@@ -112,99 +112,99 @@ public class SettingsBoard : MonoBehaviour
     public void LargeBoard() {
         SelectedBoardSize = "large";
         SetNewPointerLocation("large");
-        chooseSettingsNoise.Play();
-        unsavedChanges = true;
+        _chooseSettingsNoise.Play();
+        _unsavedChanges = true;
     }
 
     private IEnumerator LoadSceneCoroutine(string scene) {
-        yield return new WaitWhile(() => mainMenuNoise.isPlaying);
-        yield return new WaitWhile(() => applySettingsNoise.isPlaying);
+        yield return new WaitWhile(() => _mainMenuNoise.isPlaying);
+        yield return new WaitWhile(() => _applySettingsNoise.isPlaying);
 
         SceneManager.LoadScene(scene);
     }
 
     public void LoadMenuScene() {
-        mainMenuNoise.Play();
+        _mainMenuNoise.Play();
         StartCoroutine(LoadSceneCoroutine("MainMenuScene"));
     } 
 
     public void MakeTeam1Burger() {
-        team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("burger");
-        currentTeam1Icon = "burger";
-        unsavedChanges = true;
+        _team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("burger");
+        _currentTeam1Icon = "burger";
+        _unsavedChanges = true;
     }
 
     public void MakeTeam2Burger() {
-        team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("burger");
-        currentTeam2Icon = "burger";
-        unsavedChanges = true;
+        _team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("burger");
+        _currentTeam2Icon = "burger";
+        _unsavedChanges = true;
     }
 
     public void MakeTeam1Coffee() {
-        team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("coffee");
-        currentTeam1Icon = "coffee";
-        unsavedChanges = true;
+        _team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("coffee");
+        _currentTeam1Icon = "coffee";
+        _unsavedChanges = true;
     }
 
     public void MakeTeam2Coffee() {
-        team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("coffee");
-        currentTeam2Icon = "coffee";
-        unsavedChanges = true;
+        _team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("coffee");
+        _currentTeam2Icon = "coffee";
+        _unsavedChanges = true;
     }
     
     public void MakeTeam1Meat() {
-        team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("meat");
-        currentTeam1Icon = "meat";
-        unsavedChanges = true;
+        _team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("meat");
+        _currentTeam1Icon = "meat";
+        _unsavedChanges = true;
     }
 
     public void MakeTeam2Meat() {
-        team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("meat");
-        currentTeam2Icon = "meat";
-        unsavedChanges = true;
+        _team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("meat");
+        _currentTeam2Icon = "meat";
+        _unsavedChanges = true;
     }
 
     public void MakeTeam1Apple() {
-        team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("apple");
-        currentTeam1Icon = "apple";
-        unsavedChanges = true;
+        _team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("apple");
+        _currentTeam1Icon = "apple";
+        _unsavedChanges = true;
     }
 
     public void MakeTeam2Apple() {
-        team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("apple");
-        currentTeam2Icon = "apple";
-        unsavedChanges = true;
+        _team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("apple");
+        _currentTeam2Icon = "apple";
+        _unsavedChanges = true;
     }
 
     public void MakeTeam1Bee() {
-        team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("bee");
-        currentTeam1Icon = "bee";
-        unsavedChanges = true;
+        _team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("bee");
+        _currentTeam1Icon = "bee";
+        _unsavedChanges = true;
     }
 
     public void MakeTeam2Bee() {
-        team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("bee");
-        currentTeam2Icon = "bee";
-        unsavedChanges = true;
+        _team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("bee");
+        _currentTeam2Icon = "bee";
+        _unsavedChanges = true;
     }
 
     public void MakeTeam1Cocktail() {
-        team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("cocktail");
-        currentTeam1Icon = "cocktail";
-        unsavedChanges = true;
+        _team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("cocktail");
+        _currentTeam1Icon = "cocktail";
+        _unsavedChanges = true;
     }
 
     public void MakeTeam2Cocktail() {
-        team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("cocktail");
-        currentTeam2Icon = "cocktail";
-        unsavedChanges = true;
+        _team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("cocktail");
+        _currentTeam2Icon = "cocktail";
+        _unsavedChanges = true;
     }
 
     public void MediumBoard() {
         SelectedBoardSize = "medium";
         SetNewPointerLocation("medium");
-        chooseSettingsNoise.Play();
-        unsavedChanges = true;
+        _chooseSettingsNoise.Play();
+        _unsavedChanges = true;
     }
 
     private void SaveBoardSize() {
@@ -245,45 +245,45 @@ public class SettingsBoard : MonoBehaviour
     }
 
     private void SaveIcon() {
-        PlayerPrefs.SetString("team1Icon", currentTeam1Icon);
-        PlayerPrefs.SetString("team2Icon", currentTeam2Icon);
+        PlayerPrefs.SetString("team1Icon", _currentTeam1Icon);
+        PlayerPrefs.SetString("team2Icon", _currentTeam2Icon);
     }
 
     public void SmallBoard() {
         SelectedBoardSize = "small";
         SetNewPointerLocation("small");
-        chooseSettingsNoise.Play();
-        unsavedChanges = true;
+        _chooseSettingsNoise.Play();
+        _unsavedChanges = true;
     }
 
     private void SetInitialPointerLocation() {
         switch (PlayerPrefs.GetInt("BoardCols", 9)) 
         {
             case 7:
-                pointer.transform.position = smallBoardButton.transform.position;
+                _pointer.transform.position = _smallBoardButton.transform.position;
                 break;
             case 9:
-                pointer.transform.position = mediumBoardButton.transform.position;
+                _pointer.transform.position = _mediumBoardButton.transform.position;
                 break;
             case 11:
-                pointer.transform.position = largeBoardButton.transform.position;
+                _pointer.transform.position = _largeBoardButton.transform.position;
                 break;
         }
-        pointer.transform.Translate(new Vector3(0, 80, 0));
+        _pointer.transform.Translate(new Vector3(0, 80, 0));
     }
     private void SetNewPointerLocation(string boardSize) {
         switch (boardSize) 
         {
             case "small":
-                pointer.transform.position = smallBoardButton.transform.position;
+                _pointer.transform.position = _smallBoardButton.transform.position;
                 break;
             case "medium":
-                pointer.transform.position = mediumBoardButton.transform.position;
+                _pointer.transform.position = _mediumBoardButton.transform.position;
                 break;
             case "large":
-                pointer.transform.position = largeBoardButton.transform.position;
+                _pointer.transform.position = _largeBoardButton.transform.position;
                 break;
         }
-        pointer.transform.Translate(new Vector3(0, 80, 0));
+        _pointer.transform.Translate(new Vector3(0, 80, 0));
     }
 }

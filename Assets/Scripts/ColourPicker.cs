@@ -33,10 +33,10 @@ public class ColourPicker : MonoBehaviour, IPointerClickHandler
         output.a = 1.0f;
         if (team == "team1") {
             FindObjectOfType<SettingsBoard>().ColorResultTeam1.color = output;
-            FindObjectOfType<SettingsBoard>().unsavedChanges = true;
+            FindObjectOfType<SettingsBoard>()._unsavedChanges = true;
         } else {
             FindObjectOfType<SettingsBoard>().ColorResultTeam2.color = output;
-            FindObjectOfType<SettingsBoard>().unsavedChanges = true;
+            FindObjectOfType<SettingsBoard>()._unsavedChanges = true;
         }
     }
 }

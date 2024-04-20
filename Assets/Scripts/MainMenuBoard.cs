@@ -7,7 +7,7 @@ public class MainMenuBoard : MonoBehaviour {
     // Serialized Fields
 
     [SerializeField]
-    private AudioSource buttonSound;
+    private AudioSource _buttonSound;
 
     // Class Methods
 
@@ -20,17 +20,17 @@ public class MainMenuBoard : MonoBehaviour {
     }
     
     public void LoadGameScene() {
-        buttonSound.Play();
+        _buttonSound.Play();
         StartCoroutine(LoadSceneCoroutine("GameScene"));
     }
 
     private IEnumerator LoadSceneCoroutine(string scene) {
-        yield return new WaitWhile(() => buttonSound.isPlaying);
+        yield return new WaitWhile(() => _buttonSound.isPlaying);
         SceneManager.LoadScene(scene);
     }
 
     public void LoadSettingsScene() {
-        buttonSound.Play();
+        _buttonSound.Play();
         StartCoroutine(LoadSceneCoroutine("SettingsScene"));
     }
 }

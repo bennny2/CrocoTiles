@@ -7,10 +7,10 @@ public static class Letter
 
     // Fields
 
-    private static readonly Random random = new();
-    private static List<char> inPlayLettersPool = new();
-    private static List<char> availableLettersPool = new();
-    private static readonly List<char> availableLettersPoolTemplate = new()
+    private static readonly Random _random = new();
+    private static List<char> _inPlayLettersPool = new();
+    private static List<char> _availableLettersPool = new();
+    private static readonly List<char> _availableLettersPoolTemplate = new()
     {
         'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a',
         'b', 'b', 'b', 'b',
@@ -45,16 +45,16 @@ public static class Letter
     public static void AddLettersToAvailableLettersPool(string word) {
         List<char> charList = word.ToCharArray().ToList();
         foreach (char letter in charList) {
-            availableLettersPool.Add(letter);
+            _availableLettersPool.Add(letter);
         }
     }
 
     public static void AddLetterToInPlayLettersPool(char letter) {
-        inPlayLettersPool.Add(letter);
+        _inPlayLettersPool.Add(letter);
     }
 
     private static bool CheckForLetterRestrictions(char letterCandidate) {
-        int totalLetters = inPlayLettersPool.Count;
+        int totalLetters = _inPlayLettersPool.Count;
 
         if (totalLetters < 3) {
             return true;
@@ -63,7 +63,7 @@ public static class Letter
         float totalVowels = 0;
         int amountOfThatLetterInPlay = 0;
 
-        foreach (char letter in inPlayLettersPool) {
+        foreach (char letter in _inPlayLettersPool) {
             if (letter == letterCandidate) {
                 amountOfThatLetterInPlay += 1;
             }
@@ -105,9 +105,9 @@ public static class Letter
     }
 
     public static void DeleteLetterFromAvailableLettersPool(char letter) {
-        for (int i = 0; i < availableLettersPool.Count; i++) {
-            if (availableLettersPool[i] == letter) {
-                availableLettersPool.RemoveAt(i);
+        for (int i = 0; i < _availableLettersPool.Count; i++) {
+            if (_availableLettersPool[i] == letter) {
+                _availableLettersPool.RemoveAt(i);
                 return;
             }
         }
@@ -116,9 +116,9 @@ public static class Letter
     public static void DeleteLettersFromInPlayLettersPool(string word) {
         List<char> charList = word.ToCharArray().ToList();
         foreach (char letter in charList) {
-            for (int i = 0; i < inPlayLettersPool.Count; i++) {
-            if (inPlayLettersPool[i] == letter) {
-                inPlayLettersPool.RemoveAt(i);
+            for (int i = 0; i < _inPlayLettersPool.Count; i++) {
+            if (_inPlayLettersPool[i] == letter) {
+                _inPlayLettersPool.RemoveAt(i);
                 break;
             }
         }
@@ -130,7 +130,7 @@ public static class Letter
         char newLetter = '5';
 
         while (!validLetter) {
-            newLetter = availableLettersPool[random.Next(0, availableLettersPool.Count-1)];
+            newLetter = _availableLettersPool[_random.Next(0, _availableLettersPool.Count-1)];
             validLetter = CheckForLetterRestrictions(newLetter);
         }
         DeleteLetterFromAvailableLettersPool(newLetter);
@@ -139,10 +139,10 @@ public static class Letter
     }
 
     public static void InitializeLetters() {
-        availableLettersPool = new List<char>(availableLettersPoolTemplate);
+        _availableLettersPool = new List<char>(_availableLettersPoolTemplate);
     }
 
     public static void UpdateInPlayLettersPoolAfterShuffle(string newLetters) {
-        inPlayLettersPool =  new List<char>(newLetters.ToCharArray());
+        _inPlayLettersPool =  new List<char>(newLetters.ToCharArray());
     }
 }

@@ -11,53 +11,53 @@ public class Hexagon : MonoBehaviour
     // Serialized Fields
 
     [SerializeField]
-    private string hexagonCurrentState;
+    private string _hexagonCurrentState;
 
     // Fields
 
-    private Board boardObject;
-    private Button hexagonButton;
-    private TextMeshProUGUI hexagonText;
-    private Image hexagonImage;
-    private float hexagonX;
-    private float hexagonY;
-    private float hexagonZ;
+    private Board _boardObject;
+    private Button _hexagonButton;
+    private TextMeshProUGUI _hexagonText;
+    private Image _hexagonImage;
+    private float _hexagonX;
+    private float _hexagonY;
+    private float _hexagonZ;
     public const int HORIZONTALOFFSET = 70; 
     public const int VERTICALOFFSET = 80; 
     public const int VERTICALDIAGONALOFFSET = 40; 
 
     // Properties
 
-    public Board BoardObject => boardObject;
-    public TextMeshProUGUI HexagonText => hexagonText;
+    public Board BoardObject => _boardObject;
+    public TextMeshProUGUI HexagonText => _hexagonText;
     public string HexagonCurrentState 
     {
-        get => hexagonCurrentState;
-        set => hexagonCurrentState = value;
+        get => _hexagonCurrentState;
+        set => _hexagonCurrentState = value;
     }
-    public Image HexagonImage => hexagonImage;
+    public Image HexagonImage => _hexagonImage;
 
     public float HexagonX
     {
-        get => hexagonX;
-        set => hexagonX = value;
+        get => _hexagonX;
+        set => _hexagonX = value;
     }
     public float HexagonY
     {
-        get => hexagonY;
-        set => hexagonY = value;
+        get => _hexagonY;
+        set => _hexagonY = value;
     }
     public float HexagonZ
     {
-        get => hexagonZ;
-        set => hexagonZ = value;
+        get => _hexagonZ;
+        set => _hexagonZ = value;
     }
 
     // Class Methods
 
     void Awake() {
         InitilizeComponents();
-        hexagonButton.onClick.AddListener(() => boardObject.HexagonPressed(this));
+        _hexagonButton.onClick.AddListener(() => _boardObject.HexagonPressed(this));
     }
 
     public void DeleteLetter() {
@@ -75,7 +75,7 @@ public class Hexagon : MonoBehaviour
             float targetX = this.HexagonX + horizontalOffsets[i];
             float targetY = this.HexagonY + verticalOffsets[i];
 
-            Hexagon touchingHexagon = boardObject.AllHexagons.FirstOrDefault(h => h.HexagonX == targetX && h.HexagonY == targetY);
+            Hexagon touchingHexagon = _boardObject.AllHexagons.FirstOrDefault(h => h.HexagonX == targetX && h.HexagonY == targetY);
 
             if (touchingHexagon != null) {
                 touchingHexagonsArray.Add(touchingHexagon);
@@ -86,12 +86,12 @@ public class Hexagon : MonoBehaviour
     } 
 
     void InitilizeComponents() {
-        boardObject = FindObjectOfType<Board>();
-        hexagonText = GetComponentInChildren<TextMeshProUGUI>();
+        _boardObject = FindObjectOfType<Board>();
+        _hexagonText = GetComponentInChildren<TextMeshProUGUI>();
         HexagonText.outlineWidth = 0.15F;
         HexagonText.outlineColor = Color.black;
-        hexagonImage = GetComponent<Image>();
-        hexagonButton = GetComponent<Button>();
+        _hexagonImage = GetComponent<Image>();
+        _hexagonButton = GetComponent<Button>();
     }
 
     public void MakeTouchingHexagonsNeutralAroundHome() {
@@ -100,7 +100,7 @@ public class Hexagon : MonoBehaviour
             string hexState = touchingHexagon.HexagonCurrentState;
 
             if (hexState == "invisible") {
-                touchingHexagon.SetHexagonState(boardObject.Neutral);
+                touchingHexagon.SetHexagonState(_boardObject.Neutral);
             }
         }
     }
