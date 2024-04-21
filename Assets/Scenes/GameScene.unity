@@ -1064,7 +1064,7 @@ MonoBehaviour:
     _fillColor: {r: 0, g: 0, b: 0, a: 0}
     _stateName: invisible
   _neutral:
-    _fillColor: {r: 0.9433962, g: 0.91081774, b: 0.89444643, a: 1}
+    _fillColor: {r: 0.754717, g: 0.754717, b: 0.754717, a: 1}
     _stateName: neutral
   _pressedTeam1:
     _fillColor: {r: 0.2971698, g: 0.59888965, b: 1, a: 1}

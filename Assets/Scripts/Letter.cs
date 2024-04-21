@@ -8,6 +8,7 @@ public static class Letter
     // Fields
 
     private static readonly Random _random = new();
+    private static int _numberOfAttemptedLettersSoOverwriteConsonantCheckCounter = 0;
     private static List<char> _inPlayLettersPool = new();
     private static List<char> _availableLettersPool = new();
     private static readonly List<char> _availableLettersPoolTemplate = new()
@@ -53,55 +54,37 @@ public static class Letter
         _inPlayLettersPool.Add(letter);
     }
 
-    private static bool CheckForLetterRestrictions(char letterCandidate) {
+    private static bool CheckForLetterRestrictions(char letterCandidate)
+    {
         int totalLetters = _inPlayLettersPool.Count;
 
-        if (totalLetters < 3) {
+        if (totalLetters < 3)
             return true;
-        }
 
-        float totalVowels = 0;
-        int amountOfThatLetterInPlay = 0;
-
-        foreach (char letter in _inPlayLettersPool) {
-            if (letter == letterCandidate) {
-                amountOfThatLetterInPlay += 1;
-            }
-            if (letter == 'a' || letter == 'e' || letter == 'i' || letter == 'o' || letter == 'u') {
-                totalVowels += 1;
-            }
-        }
-
+        int amountOfThatLetterInPlay = CountOccurrences(_inPlayLettersPool, letterCandidate);
+        float totalVowels = CountVowels(_inPlayLettersPool);
         float totalConsonants = totalLetters - totalVowels;
 
-        if (letterCandidate == 'a' || letterCandidate == 'e' || letterCandidate == 'i' || letterCandidate == 'o' || letterCandidate == 'u') {
-            totalVowels += 1;
-        } else {
-            totalConsonants += 1;
-        }
+        if (ExceedsLetterLimit(totalLetters, amountOfThatLetterInPlay))
+            return false;
 
-        if (totalLetters < 10 && amountOfThatLetterInPlay > 1) {
+        if (ExceedsVowelThreshold(totalLetters, totalVowels))
             return false;
-        }
-        if (totalLetters < 15 && amountOfThatLetterInPlay > 2) {
-            return false;
-        }
-        if (totalLetters < 20 && amountOfThatLetterInPlay > 3) {
-            return false;
-        } 
-        if (totalLetters < 25 && amountOfThatLetterInPlay > 4) {
-            return false;
-        }
-        
-        bool tooManyVowels = totalVowels / totalLetters > 0.6f;
-        bool tooManyConsonants = totalConsonants / totalLetters > 0.8f;
 
-        if (tooManyVowels) {
+        if (ExceedsConsonantThreshold(totalLetters, totalConsonants) && _numberOfAttemptedLettersSoOverwriteConsonantCheckCounter > 5)
             return false;
-        } //else if (tooManyConsonants) {
-            //return false;
-        //}
+
         return true;
+    }
+
+    private static int CountOccurrences(IEnumerable<char> letters, char target)
+    {
+        return letters.Count(letter => letter == target);
+    }
+
+    private static float CountVowels(IEnumerable<char> letters)
+    {
+        return letters.Count(IsVowel);
     }
 
     public static void DeleteLetterFromAvailableLettersPool(char letter) {
@@ -125,6 +108,29 @@ public static class Letter
         }
     }
 
+    private static bool ExceedsConsonantThreshold(int totalLetters, float totalConsonants)
+    {
+        return false; // totalConsonants / totalLetters > 0.85f; ----------    <-- actual code for consonant check, causes random crashes
+    }
+
+    private static bool ExceedsLetterLimit(int totalLetters, int amountOfThatLetterInPlay)
+    {
+        if (totalLetters < 10 && amountOfThatLetterInPlay > 1)
+            return true;
+        if (totalLetters < 15 && amountOfThatLetterInPlay > 2)
+            return true;
+        if (totalLetters < 20 && amountOfThatLetterInPlay > 3)
+            return true;
+        if (totalLetters < 25 && amountOfThatLetterInPlay > 4)
+            return true;
+        return false;
+    }
+
+    private static bool ExceedsVowelThreshold(int totalLetters, float totalVowels)
+    {
+        return totalVowels / totalLetters > 0.6f;
+    }
+
     public static string GenerateLetter() {
         bool validLetter = false; 
         char newLetter = '5';
@@ -132,7 +138,10 @@ public static class Letter
         while (!validLetter) {
             newLetter = _availableLettersPool[_random.Next(0, _availableLettersPool.Count-1)];
             validLetter = CheckForLetterRestrictions(newLetter);
+            _numberOfAttemptedLettersSoOverwriteConsonantCheckCounter += 1;
+            UnityEngine.Debug.Log(_numberOfAttemptedLettersSoOverwriteConsonantCheckCounter);
         }
+        _numberOfAttemptedLettersSoOverwriteConsonantCheckCounter = 0;
         DeleteLetterFromAvailableLettersPool(newLetter);
         AddLetterToInPlayLettersPool(newLetter);
         return newLetter.ToString();
@@ -140,6 +149,11 @@ public static class Letter
 
     public static void InitializeLetters() {
         _availableLettersPool = new List<char>(_availableLettersPoolTemplate);
+    }
+
+    private static bool IsVowel(char letter)
+    {
+        return "aeiou".Contains(letter);
     }
 
     public static void UpdateInPlayLettersPoolAfterShuffle(string newLetters) {
