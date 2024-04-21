@@ -42,7 +42,6 @@ public class SettingsBoard : MonoBehaviour
 
     public Image ColorResultTeam1 { get => ColorResultTeam11; set => ColorResultTeam11 = value; }
     public Image ColorResultTeam2 { get => ColorResultTeam21; set => ColorResultTeam21 = value; }
-    public string CurrentTeam1Icon { get => _currentTeam1Icon; set => _currentTeam1Icon = value; }
     public bool UnsavedChanges { get => unsavedChanges; set => unsavedChanges = value; }
     public string SelectedBoardSize { get; private set; }
     public AudioSource ApplySettingsNoise { get => _applySettingsNoise; set => _applySettingsNoise = value; }
@@ -57,6 +56,8 @@ public class SettingsBoard : MonoBehaviour
     public GameObject SmallBoardButton { get => _smallBoardButton; set => _smallBoardButton = value; }
     public GameObject MediumBoardButton { get => _mediumBoardButton; set => _mediumBoardButton = value; }
     public GameObject LargeBoardButton { get => _largeBoardButton; set => _largeBoardButton = value; }
+    public string CurrentTeam2Icon { get => _currentTeam2Icon; set => _currentTeam2Icon = value; }
+    public string CurrentTeam1Icon { get => _currentTeam1Icon; set => _currentTeam1Icon = value; }
 
     // Class Methods
 
@@ -136,73 +137,73 @@ public class SettingsBoard : MonoBehaviour
 
     public void MakeTeam1Burger() {
         Team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("burger");
-        _currentTeam1Icon = "burger";
+        CurrentTeam1Icon = "burger";
         UnsavedChanges = true;
     }
 
     public void MakeTeam2Burger() {
         Team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("burger");
-        _currentTeam2Icon = "burger";
+        CurrentTeam2Icon = "burger";
         UnsavedChanges = true;
     }
 
     public void MakeTeam1Coffee() {
         Team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("coffee");
-        _currentTeam1Icon = "coffee";
+        CurrentTeam1Icon = "coffee";
         UnsavedChanges = true;
     }
 
     public void MakeTeam2Coffee() {
         Team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("coffee");
-        _currentTeam2Icon = "coffee";
+        CurrentTeam2Icon = "coffee";
         UnsavedChanges = true;
     }
     
     public void MakeTeam1Meat() {
         Team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("meat");
-        _currentTeam1Icon = "meat";
+        CurrentTeam1Icon = "meat";
         UnsavedChanges = true;
     }
 
     public void MakeTeam2Meat() {
         Team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("meat");
-        _currentTeam2Icon = "meat";
+        CurrentTeam2Icon = "meat";
         UnsavedChanges = true;
     }
 
     public void MakeTeam1Apple() {
         Team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("apple");
-        _currentTeam1Icon = "apple";
+        CurrentTeam1Icon = "apple";
         UnsavedChanges = true;
     }
 
     public void MakeTeam2Apple() {
         Team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("apple");
-        _currentTeam2Icon = "apple";
+        CurrentTeam2Icon = "apple";
         UnsavedChanges = true;
     }
 
     public void MakeTeam1Bee() {
         Team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("bee");
-        _currentTeam1Icon = "bee";
+        CurrentTeam1Icon = "bee";
         UnsavedChanges = true;
     }
 
     public void MakeTeam2Bee() {
         Team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("bee");
-        _currentTeam2Icon = "bee";
+        CurrentTeam2Icon = "bee";
         UnsavedChanges = true;
     }
 
     public void MakeTeam1Cocktail() {
         Team1IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("cocktail");
-        _currentTeam1Icon = "cocktail";
+        CurrentTeam1Icon = "cocktail";
         UnsavedChanges = true;
     }
 
     public void MakeTeam2Cocktail() {
         Team2IconShowcase.GetComponent<Image>().sprite = Resources.Load<Sprite>("cocktail");
-        _currentTeam2Icon = "cocktail";
+        CurrentTeam2Icon = "cocktail";
         UnsavedChanges = true;
     }
 
@@ -251,8 +252,8 @@ public class SettingsBoard : MonoBehaviour
     }
 
     private void SaveIcon() {
-        PlayerPrefs.SetString("team1Icon", _currentTeam1Icon);
-        PlayerPrefs.SetString("team2Icon", _currentTeam2Icon);
+        PlayerPrefs.SetString("team1Icon", CurrentTeam1Icon);
+        PlayerPrefs.SetString("team2Icon", CurrentTeam2Icon);
     }
 
     public void SmallBoard() {

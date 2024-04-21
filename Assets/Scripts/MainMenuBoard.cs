@@ -9,6 +9,10 @@ public class MainMenuBoard : MonoBehaviour {
     [SerializeField]
     private AudioSource _buttonSound;
 
+    // Properties
+
+    public AudioSource ButtonSound { get => _buttonSound; set => _buttonSound = value; }
+
     // Class Methods
 
     public void ExitGame() {
@@ -20,17 +24,17 @@ public class MainMenuBoard : MonoBehaviour {
     }
     
     public void LoadGameScene() {
-        _buttonSound.Play();
+        ButtonSound.Play();
         StartCoroutine(LoadSceneCoroutine("GameScene"));
     }
 
     private IEnumerator LoadSceneCoroutine(string scene) {
-        yield return new WaitWhile(() => _buttonSound.isPlaying);
+        yield return new WaitWhile(() => ButtonSound.isPlaying);
         SceneManager.LoadScene(scene);
     }
 
     public void LoadSettingsScene() {
-        _buttonSound.Play();
+        ButtonSound.Play();
         StartCoroutine(LoadSceneCoroutine("SettingsScene"));
     }
 }
