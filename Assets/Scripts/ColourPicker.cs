@@ -8,11 +8,15 @@ public class ColourPicker : MonoBehaviour, IPointerClickHandler
     // Serialize Fields
 
     [SerializeField]
-    private string team;
+    private string _team;
 
     // Fields
 
-    public Color output;
+    public Color _output;
+
+    // Properties
+
+    public string Team { get => _team; set => _team = value; }
 
     // Class Methods
 
@@ -28,14 +32,14 @@ public class ColourPicker : MonoBehaviour, IPointerClickHandler
     }
 
     public void OnPointerClick(PointerEventData eventData) {
-        //FindObjectOfType<SettingsBoard>().ChooseSettingsNoise.Play();
-        output = Pick(Camera.main.WorldToScreenPoint(eventData.position), GetComponent<Image>());
-        output.a = 1.0f;
-        if (team == "team1") {
-            FindObjectOfType<SettingsBoard>().ColorResultTeam1.color = output;
+        FindObjectOfType<SettingsBoard>().ChooseSettingsNoise.Play();
+        _output = Pick(Camera.main.WorldToScreenPoint(eventData.position), GetComponent<Image>());
+        _output.a = 1.0f;
+        if (Team == "team1") {
+            FindObjectOfType<SettingsBoard>().ColorResultTeam1.color = _output;
             FindObjectOfType<SettingsBoard>().UnsavedChanges = true;
         } else {
-            FindObjectOfType<SettingsBoard>().ColorResultTeam2.color = output;
+            FindObjectOfType<SettingsBoard>().ColorResultTeam2.color = _output;
             FindObjectOfType<SettingsBoard>().UnsavedChanges = true;
         }
     }
