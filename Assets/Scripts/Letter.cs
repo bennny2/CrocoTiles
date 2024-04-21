@@ -40,30 +40,37 @@ public static class Letter
         'z', 'z'
     };
 
+    // Properties
+
+    public static Random Random => _random;
+    public static List<char> InPlayLettersPool { get => _inPlayLettersPool; set => _inPlayLettersPool = value; }
+    public static List<char> AvailableLettersPool { get => _availableLettersPool; set => _availableLettersPool = value; }
+    public static List<char> AvailableLettersPoolTemplate => _availableLettersPoolTemplate;
+
     // Class Methods
 
     public static void AddLettersToAvailableLettersPool(string word) {
         List<char> charList = word.ToCharArray().ToList();
         foreach (char letter in charList) {
-            _availableLettersPool.Add(letter);
+            AvailableLettersPool.Add(letter);
         }
     }
 
     public static void AddLetterToInPlayLettersPool(char letter) {
-        _inPlayLettersPool.Add(letter);
+        InPlayLettersPool.Add(letter);
     }
 
     private static bool CheckForLetterRestrictions(char letterCandidate)
     {
-        int totalLetters = _inPlayLettersPool.Count;
+        int totalLetters = InPlayLettersPool.Count;
         bool letterCandidateIsVowel = IsVowel(letterCandidate);
 
         if (totalLetters < 3) {
             return true;
         }
             
-        int amountOfThatLetterInPlay = CountOccurrences(_inPlayLettersPool, letterCandidate);
-        float totalVowels = CountVowels(_inPlayLettersPool);
+        int amountOfThatLetterInPlay = CountOccurrences(InPlayLettersPool, letterCandidate);
+        float totalVowels = CountVowels(InPlayLettersPool);
         float totalConsonants = totalLetters - totalVowels;
 
         if (ExceedsLetterLimit(totalLetters, amountOfThatLetterInPlay)) {
@@ -92,9 +99,9 @@ public static class Letter
     }
 
     public static void DeleteLetterFromAvailableLettersPool(char letter) {
-        for (int i = 0; i < _availableLettersPool.Count; i++) {
-            if (_availableLettersPool[i] == letter) {
-                _availableLettersPool.RemoveAt(i);
+        for (int i = 0; i < AvailableLettersPool.Count; i++) {
+            if (AvailableLettersPool[i] == letter) {
+                AvailableLettersPool.RemoveAt(i);
                 return;
             }
         }
@@ -103,9 +110,9 @@ public static class Letter
     public static void DeleteLettersFromInPlayLettersPool(string word) {
         List<char> charList = word.ToCharArray().ToList();
         foreach (char letter in charList) {
-            for (int i = 0; i < _inPlayLettersPool.Count; i++) {
-            if (_inPlayLettersPool[i] == letter) {
-                _inPlayLettersPool.RemoveAt(i);
+            for (int i = 0; i < InPlayLettersPool.Count; i++) {
+            if (InPlayLettersPool[i] == letter) {
+                InPlayLettersPool.RemoveAt(i);
                 break;
             }
         }
@@ -136,12 +143,12 @@ public static class Letter
     }
 
     public static string GenerateLetter() {
-    List<char> validLetters = _availableLettersPool.Where(CheckForLetterRestrictions).ToList();
+    List<char> validLetters = AvailableLettersPool.Where(CheckForLetterRestrictions).ToList();
     char newLetter = '5';
     if (validLetters.Count == 0) {
-        newLetter = _availableLettersPool[_random.Next(0, _availableLettersPool.Count-1)];
+        newLetter = AvailableLettersPool[Random.Next(0, AvailableLettersPool.Count-1)];
     } else {
-        newLetter = validLetters[_random.Next(0, validLetters.Count)];
+        newLetter = validLetters[Random.Next(0, validLetters.Count)];
     }
     DeleteLetterFromAvailableLettersPool(newLetter);
     AddLetterToInPlayLettersPool(newLetter);
@@ -150,7 +157,7 @@ public static class Letter
 
 
     public static void InitializeLetters() {
-        _availableLettersPool = new List<char>(_availableLettersPoolTemplate);
+        AvailableLettersPool = new List<char>(AvailableLettersPoolTemplate);
     }
 
     private static bool IsVowel(char letter)
@@ -159,6 +166,6 @@ public static class Letter
     }
 
     public static void UpdateInPlayLettersPoolAfterShuffle(string newLetters) {
-        _inPlayLettersPool =  new List<char>(newLetters.ToCharArray());
+        InPlayLettersPool =  new List<char>(newLetters.ToCharArray());
     }
 }
