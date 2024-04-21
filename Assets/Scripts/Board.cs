@@ -76,39 +76,6 @@ public class Board : MonoBehaviour
     private Trie _trie = new();
     private bool _team1Turn = true;
     private int _shuffleCounter = 0;
-    
-    // Properties
-
-    public List<Hexagon> AllHexagons
-    {
-        get => _allHexagons;
-        set => _allHexagons = value;
-    }
-    public bool BonusTurnActive
-    {
-        get => _bonusTurnActive;
-        set => _bonusTurnActive = value;
-    }
-
-    
-    public CurrentWord CurrentWordObjectOnScreen
-    {
-        get => _currentWordObjectOnScreen;
-        set => _currentWordObjectOnScreen = value;
-    }
-    
-
-    public List<string> ListOfLettersPressed 
-    {
-        get => _listOfLettersPressed;
-        set => _listOfLettersPressed = value;
-    }
-    
-    public bool Team1Turn
-    {
-        get => _team1Turn;
-        set => _team1Turn = value;
-    }        
 
     // Hexagon State Properties
 
@@ -120,6 +87,34 @@ public class Board : MonoBehaviour
     public HexagonStates PressedTeam2 => _pressedTeam2;
     public HexagonStates TerritoryTeam1 => _territoryTeam1;
     public HexagonStates TerritoryTeam2 => _territoryTeam2;
+    
+    // Properties
+
+    public List<Hexagon> AllHexagons { get => _allHexagons; set => _allHexagons = value; }
+    public bool BonusTurnActive { get => _bonusTurnActive; set => _bonusTurnActive = value; }
+    public CurrentWord CurrentWordObjectOnScreen { get => CurrentWordObjectOnScreen1; set => CurrentWordObjectOnScreen1 = value; }
+    public List<string> ListOfLettersPressed  { get => _listOfLettersPressed; set => _listOfLettersPressed = value; }
+    public bool Team1Turn { get => _team1Turn; set => _team1Turn = value; }        
+    public int ShuffleCounter { get => _shuffleCounter; set => _shuffleCounter = value; }
+    internal Trie Trie { get => _trie; set => _trie = value; }
+    public AudioSource AudioClearWord { get => _audioClearWord; set => _audioClearWord = value; }
+    public AudioSource AudioPressed { get => _audioPressed; set => _audioPressed = value; }
+    public AudioSource AudioUnPressed { get => _audioUnPressed; set => _audioUnPressed = value; }
+    public AudioSource AudioWordSubmit { get => _audioWordSubmit; set => _audioWordSubmit = value; }
+    public AudioSource AudioWordFailed { get => _audioWordFailed; set => _audioWordFailed = value; }
+    public AudioSource AudioVictory { get => _audioVictory; set => _audioVictory = value; }
+    public AudioSource ChooseSettingsNoise { get => _chooseSettingsNoise; set => _chooseSettingsNoise = value; }
+    public Button PlayAgainButton { get => _playAgainButton; set => _playAgainButton = value; }
+    public Button QuitButton { get => _quitButton; set => _quitButton = value; }
+    public GameObject WinnerBlock { get => _winnerBlock; set => _winnerBlock = value; }
+    public GameObject HexagonPrefab { get => _hexagonPrefab; set => _hexagonPrefab = value; }
+    public Transform BoardTransform { get => _boardTransform; set => _boardTransform = value; }
+    public CurrentWord CurrentWordObjectOnScreen1 { get => _currentWordObjectOnScreen; set => _currentWordObjectOnScreen = value; }
+    public TextMeshProUGUI WinnerBlockText { get => _winnerBlockText; set => _winnerBlockText = value; }
+    public GameObject Team1Icon { get => _team1Icon; set => _team1Icon = value; }
+    public GameObject Team2Icon { get => _team2Icon; set => _team2Icon = value; }
+    public GameObject BonusReminder { get => _bonusReminder; set => _bonusReminder = value; }
+    public GameObject AutoShufflePopup { get => _autoShufflePopup; set => _autoShufflePopup = value; }
 
     // Class Methods
 
@@ -154,16 +149,16 @@ public class Board : MonoBehaviour
     }
 
     private void CheckIfAllLettersOnBoardShouldBeShuffled() {
-        if (_shuffleCounter < 10) {
-            _shuffleCounter += 1;
+        if (ShuffleCounter < 10) {
+            ShuffleCounter += 1;
         } else {
             StartCoroutine(ShufflePopup2Seconds());
-            _shuffleCounter = 0;
+            ShuffleCounter = 0;
         }
     }
 
     private void CheckBoardIsPlayable() {
-        if (!_trie.CanFormValidWord(AllHexagons)) {
+        if (!Trie.CanFormValidWord(AllHexagons)) {
             StartCoroutine(ShufflePopup2Seconds());
         }
     }
@@ -211,7 +206,7 @@ public class Board : MonoBehaviour
     }
 
     public void ClearPressedHexagonsInvalidWord() {
-        foreach (Hexagon hex in _allHexagons)
+        foreach (Hexagon hex in AllHexagons)
         {
             if (IsHexagonPressed(hex))
             {
@@ -221,7 +216,7 @@ public class Board : MonoBehaviour
     }
 
     private void ClearPressedHexagonsValidWord() {
-        foreach (Hexagon hex in _allHexagons)
+        foreach (Hexagon hex in AllHexagons)
         {
             if (IsHexagonPressed(hex))
             {
@@ -233,14 +228,14 @@ public class Board : MonoBehaviour
     public void ClearWord() {
         if (!string.IsNullOrWhiteSpace(CurrentWordObjectOnScreen.CurrentWordText.text)) {
             ResetWordState();
-            _audioClearWord.Play();
+            AudioClearWord.Play();
             ClearPressedHexagonsInvalidWord();
             ProcessGlowingHexagons();
         }
     }
 
     public void CreateHexagon(Vector3 position) {
-        GameObject newHexagonObject = Instantiate(_hexagonPrefab, _boardTransform);
+        GameObject newHexagonObject = Instantiate(HexagonPrefab, BoardTransform);
         newHexagonObject.transform.SetLocalPositionAndRotation(position, Quaternion.identity);
         Hexagon newHexagon = newHexagonObject.GetComponent<Hexagon>();
         newHexagon.HexagonX = position.x;
@@ -266,32 +261,32 @@ public class Board : MonoBehaviour
     }
 
     private string GetOpponentHomeState(string hexState) {
-        return _team1Turn ? "homeTeam2" : "homeTeam1";
+        return Team1Turn ? "homeTeam2" : "homeTeam1";
     }
 
     private void HasWon() {
-        _bonusReminder.SetActive(false);
-        if (!_team1Turn) {
-            _winnerBlockText.text = "Team 1 has Won!";
+        BonusReminder.SetActive(false);
+        if (!Team1Turn) {
+            WinnerBlockText.text = "Team 1 has Won!";
         } else {
-            _winnerBlockText.text = "Team 2 has Won!";
+            WinnerBlockText.text = "Team 2 has Won!";
         }
-        _audioVictory.Play();
-        _winnerBlock.SetActive(true);
-        _playAgainButton.gameObject.SetActive(true);
-        _quitButton.gameObject.SetActive(true);
+        AudioVictory.Play();
+        WinnerBlock.SetActive(true);
+        PlayAgainButton.gameObject.SetActive(true);
+        QuitButton.gameObject.SetActive(true);
         ChangeTurn();
     }
 
     public void HexagonPressed(Hexagon hex) {
         string hexState = hex.HexagonCurrentState;
         if (hexState == "neutral") {
-            _audioPressed.Play();
+            AudioPressed.Play();
             CurrentWordAddNewLetter(hex.HexagonText.text);
             hex.SetHexagonState(GetCurrentTeam());
 
         } else if (hexState == "pressedTeam1" || hexState == "pressedTeam2") {
-            _audioUnPressed.Play();
+            AudioUnPressed.Play();
             CurrentWordRemoveMostRecentLetter(hex.HexagonText.text);
             hex.SetHexagonState(Neutral);
 
@@ -384,7 +379,7 @@ public class Board : MonoBehaviour
     }
 
     private void InitializeWinnerBlock() {
-        RectTransform winnerBlockRect = _winnerBlock.GetComponent<RectTransform>();
+        RectTransform winnerBlockRect = WinnerBlock.GetComponent<RectTransform>();
         winnerBlockRect.SetAsLastSibling();
     }
 
@@ -395,30 +390,30 @@ public class Board : MonoBehaviour
             string[] words = dictionary.text.Split('\n');
             foreach (string word in words)
             {
-                _trie.Insert(word.ToLower().Trim());
+                Trie.Insert(word.ToLower().Trim());
             }
         }
     }
 
     private void Loadicons(){
-        _team1Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>(PlayerPrefs.GetString("team1Icon"));
-        _team2Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>(PlayerPrefs.GetString("team2Icon"));
+        Team1Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>(PlayerPrefs.GetString("team1Icon"));
+        Team2Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>(PlayerPrefs.GetString("team2Icon"));
 
-        if (_team1Icon.GetComponent<Image>().sprite == null){
-            _team1Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>("apple");
+        if (Team1Icon.GetComponent<Image>().sprite == null){
+            Team1Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>("apple");
         }
-        if (_team2Icon.GetComponent<Image>().sprite == null){
-            _team2Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>("bee");
+        if (Team2Icon.GetComponent<Image>().sprite == null){
+            Team2Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>("bee");
         }
     }
 
     public void LoadMainMenu() {
-        _chooseSettingsNoise.Play();
+        ChooseSettingsNoise.Play();
         StartCoroutine(LoadSceneCoroutine("MainMenuScene"));
     }
 
     private IEnumerator LoadSceneCoroutine(string scene) {
-        yield return new WaitWhile(() => _chooseSettingsNoise.isPlaying);
+        yield return new WaitWhile(() => ChooseSettingsNoise.isPlaying);
         SceneManager.LoadScene(scene);
     }
 
@@ -444,20 +439,20 @@ public class Board : MonoBehaviour
         {
             string hexState = touchingHexagon.HexagonCurrentState;
 
-            if ((_team1Turn && ShouldMakeNeutralForTeam1(hexState)) || (!_team1Turn && ShouldMakeNeutralForTeam2(hexState)))
+            if ((Team1Turn && ShouldMakeNeutralForTeam1(hexState)) || (!Team1Turn && ShouldMakeNeutralForTeam2(hexState)))
             {
                 touchingHexagon.SetHexagonState(Neutral);
 
                 if (IsHomeState(hexState))
                 {
                     //disable icon for the opposite team
-                    if (_team1Turn) {
-                        _team2Icon.SetActive(false);
+                    if (Team1Turn) {
+                        Team2Icon.SetActive(false);
                     } else {
-                        _team1Icon.SetActive(false);
+                        Team1Icon.SetActive(false);
                     }
 
-                    _bonusReminder.SetActive(true);
+                    BonusReminder.SetActive(true);
                     BonusTurnActive = true;
                     touchingHexagon.SetLetter();
                     SetNewHome(GetOpponentHomeState(hexState));
@@ -467,10 +462,10 @@ public class Board : MonoBehaviour
     }
 
     private void PlayAgain() {
-        _winnerBlock.SetActive(false);
-        _playAgainButton.gameObject.SetActive(false);
-        _quitButton.gameObject.SetActive(false);
-        _shuffleCounter = 0;
+        WinnerBlock.SetActive(false);
+        PlayAgainButton.gameObject.SetActive(false);
+        QuitButton.gameObject.SetActive(false);
+        ShuffleCounter = 0;
         Letter.InitializeLetters();
         ClearLetters();
         MakeAllHexagonsInvisible();
@@ -512,9 +507,9 @@ public class Board : MonoBehaviour
     private void ProcessTouchingHex(Hexagon touchingHex, string team) {
         touchingHex.DeleteLetter();
         if (team == "Team1") {
-            touchingHex.SetHexagonState(_territoryTeam1);
+            touchingHex.SetHexagonState(TerritoryTeam1);
         } else {
-            touchingHex.SetHexagonState(_territoryTeam2);
+            touchingHex.SetHexagonState(TerritoryTeam2);
         }
         
         List<Hexagon> touchingHexagonsArray = touchingHex.FindTouchingHexagons();
@@ -536,7 +531,7 @@ public class Board : MonoBehaviour
         CheckBoardIsPlayable();
         CheckHomesAreSet();
         CheckBonusTurn();
-        _audioWordSubmit.Play();
+        AudioWordSubmit.Play();
         ProcessGlowingHexagons();
         CheckIfAllLettersOnBoardShouldBeShuffled();
     }
@@ -544,7 +539,7 @@ public class Board : MonoBehaviour
     private void ProcessInvalidWord() {
         ClearPressedHexagonsInvalidWord();
         ResetWordState();
-        _audioWordFailed.Play();
+        AudioWordFailed.Play();
     }
 
     public void ResetWordState() {
@@ -593,11 +588,11 @@ public class Board : MonoBehaviour
         AllHexagons[base1 - 1].SetHexagonState(HomeTeam1);
         AllHexagons[base2 - 1].SetHexagonState(HomeTeam2);
 
-        _team1Icon.SetActive(true);
-        _team2Icon.SetActive(true);
+        Team1Icon.SetActive(true);
+        Team2Icon.SetActive(true);
 
-        _team1Icon.transform.position = new Vector2(AllHexagons[base1 - 1].HexagonX / 108f, AllHexagons[base1 - 1].HexagonY / 108f);
-        _team2Icon.transform.position = new Vector2(AllHexagons[base2 - 1].HexagonX / 108f, AllHexagons[base2 - 1].HexagonY / 108f);
+        Team1Icon.transform.position = new Vector2(AllHexagons[base1 - 1].HexagonX / 108f, AllHexagons[base1 - 1].HexagonY / 108f);
+        Team2Icon.transform.position = new Vector2(AllHexagons[base2 - 1].HexagonX / 108f, AllHexagons[base2 - 1].HexagonY / 108f);
     }
 
     private void SetHexagonStateForTeam(Hexagon hex, string team) {
@@ -626,10 +621,10 @@ public class Board : MonoBehaviour
     }
 
     IEnumerator ShufflePopup2Seconds() {
-        _autoShufflePopup.SetActive(true);
+        AutoShufflePopup.SetActive(true);
         yield return new WaitForSeconds(2);
         ShuffleLetters();
-        _autoShufflePopup.SetActive(false);
+        AutoShufflePopup.SetActive(false);
     }
     private bool ShouldMakeNeutralForTeam1(string hexState) {
         return hexState != "homeTeam1" && hexState != "territoryTeam1" && hexState != "pressedTeam1";
@@ -662,7 +657,7 @@ public class Board : MonoBehaviour
 
     public void SubmitButtonPressed() {
 
-        if (_trie.Search(CurrentWordObjectOnScreen.CurrentWordText.text.ToLower()))
+        if (Trie.Search(CurrentWordObjectOnScreen.CurrentWordText.text.ToLower()))
         {
             ProcessValidWord();
         }
@@ -673,7 +668,7 @@ public class Board : MonoBehaviour
     }
 
     private void UpdateTeamIconPosition(Hexagon hex, string team) {
-        GameObject teamIcon = team == "homeTeam2" ? _team2Icon : _team1Icon;
+        GameObject teamIcon = team == "homeTeam2" ? Team2Icon : Team1Icon;
         teamIcon.SetActive(true);
         teamIcon.transform.position = new Vector2(hex.HexagonX / 108f, hex.HexagonY / 108f);
     }
