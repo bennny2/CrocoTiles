@@ -138,7 +138,7 @@ public class Board : MonoBehaviour
     }
 
     void Update() {
-        if (Input.GetMouseButtonDown(1)) {
+        if (Input.GetMouseButtonDown(1) && (PlayerPrefs.GetString("GameType", "Local") == "Local" || Team1Turn)) {
             ClearWord();
         }
     }
