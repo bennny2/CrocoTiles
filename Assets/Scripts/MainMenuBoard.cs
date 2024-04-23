@@ -23,7 +23,14 @@ public class MainMenuBoard : MonoBehaviour {
         #endif
     }
     
-    public void LoadGameScene() {
+    public void LoadGameSceneLocalGame() {
+        PlayerPrefs.SetString("GameType", "Local");
+        ButtonSound.Play();
+        StartCoroutine(LoadSceneCoroutine("GameScene"));
+    }
+
+    public void LoadGameSceneVsCPU() {
+        PlayerPrefs.SetString("GameType", "CPU");
         ButtonSound.Play();
         StartCoroutine(LoadSceneCoroutine("GameScene"));
     }
