@@ -67,6 +67,8 @@ public class Board : MonoBehaviour
     private GameObject _bonusReminder;
     [SerializeField]
     private GameObject _autoShufflePopup;
+    [SerializeField]
+    private GameObject _boardInteractionBlocker;
 
     // Fields
 
@@ -115,6 +117,7 @@ public class Board : MonoBehaviour
     public GameObject Team2Icon { get => _team2Icon; set => _team2Icon = value; }
     public GameObject BonusReminder { get => _bonusReminder; set => _bonusReminder = value; }
     public GameObject AutoShufflePopup { get => _autoShufflePopup; set => _autoShufflePopup = value; }
+    public GameObject BoardInteractionBlocker { get => _boardInteractionBlocker; set => _boardInteractionBlocker = value; }
 
     // Class Methods
 
@@ -138,6 +141,12 @@ public class Board : MonoBehaviour
         if (Input.GetMouseButtonDown(1)) {
             ClearWord();
         }
+    }
+
+    private void ActivateCPUsTurn() {
+        BoardInteractionBlocker.SetActive(true);
+        GenerateCPUsWord();
+        PlayCPUsWordOnBoard();
     }
 
     private void ChangeTurn() { 
@@ -187,6 +196,20 @@ public class Board : MonoBehaviour
         }
         if (noHomeTeam2 == true) {
             SetNewHome("homeTeam2");
+        }
+    }
+
+    private void CheckIfIsCPUTurn() {
+        switch (PlayerPrefs.GetString("GameType", "Local")) {   
+            case "Local":
+                return;
+            case "CPU":
+                if (!Team1Turn) {
+                    ActivateCPUsTurn();
+                } else {
+                    DeactivateCPUsTurn();
+                }
+                break;
         }
     }
 
@@ -254,6 +277,14 @@ public class Board : MonoBehaviour
         ListOfLettersPressed.Add(letter);
         string word = string.Join("", ListOfLettersPressed);
         CurrentWordObjectOnScreen.UpdateCurrentWord(word);
+    }
+
+    private void DeactivateCPUsTurn() {
+        BoardInteractionBlocker.SetActive(false);
+    }
+
+    private void GenerateCPUsWord() {
+
     }
 
     private HexagonStates GetCurrentTeam() {
@@ -475,6 +506,10 @@ public class Board : MonoBehaviour
         Team1Turn = true;
     }
 
+    private void PlayCPUsWordOnBoard() {
+
+    }
+
     private void ProcessGlowingHexagons() {
         foreach (Hexagon hex in AllHexagons)
         {
@@ -534,6 +569,7 @@ public class Board : MonoBehaviour
         AudioWordSubmit.Play();
         ProcessGlowingHexagons();
         CheckIfAllLettersOnBoardShouldBeShuffled();
+        CheckIfIsCPUTurn();
     }
 
     private void ProcessInvalidWord() {
