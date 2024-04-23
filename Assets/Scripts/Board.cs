@@ -286,19 +286,22 @@ public class Board : MonoBehaviour
         List<Hexagon> result = new();
         List<Hexagon> neutralHexes = new(AllHexagons.Where(hex => hex.HexagonCurrentState == "neutral"));
 
-        return GenereateWordForCPUFromLetters(neutralHexes);
-    }
-
-    private List<Hexagon> GenereateWordForCPUFromLetters(List<Hexagon> neutralHexes) {
         for (int length = 3; length <= 5; length++) {
-            List<string> permutations = Trie.GetPermutationsWithDuplicates(neutralHexes, length).Select(perm => string.Join("", perm)).ToList();
+            IEnumerable<IEnumerable<Hexagon>> hexPermutationsEnumerable = Trie.GetPermutationsWithDuplicates(neutralHexes, length);
+            List<List<Hexagon>> hexPermutationsList = hexPermutationsEnumerable
+                .Select(innerSequence => innerSequence.ToList()) // Convert each inner sequence to a list
+                .ToList(); // Convert the outer sequence to a list
 
-            foreach (string potentialWord in permutations) {
-                if (Trie.Search(potentialWord)) {
-                    //Debug.Log(potentialWord);
-                    return true;
+            foreach (List<Hexagon> permutation in hexPermutationsList) {
+                string word = "";
+                foreach (Hexagon hex in permutation) {
+                    word += hex.HexagonText.text;
                 }
+                if (Trie.Search(word)) {
+                    return permutation;
+                } 
             }
+            Debug.Log("CPU could not find a word to play");
         }
 
         List<Hexagon> ListOfHexesToPlay = new();
@@ -510,7 +513,7 @@ public class Board : MonoBehaviour
         }
     }
 
-    private void PlayAgain() {
+    private void PlayAgain() { //referenced by button in game
         WinnerBlock.SetActive(false);
         PlayAgainButton.gameObject.SetActive(false);
         QuitButton.gameObject.SetActive(false);
@@ -524,10 +527,17 @@ public class Board : MonoBehaviour
         Team1Turn = true;
     }
 
-    private void PlayCPUsWordOnBoard(List<Hexagon> Hexes) {
-        foreach (Hexagon hex in Hexes) {
+    private void PlayCPUsWordOnBoard(List<Hexagon> hexes) {
+        StartCoroutine(PressHexagonsForCPU(hexes));
+    }
+
+    IEnumerator PressHexagonsForCPU(List<Hexagon> hexes) {
+        foreach (Hexagon hex in hexes) {
+            yield return new WaitForSeconds(1);
             HexagonPressed(hex);
         }
+        yield return new WaitForSeconds(1);
+        SubmitButtonPressed();
     }
 
     private void ProcessGlowingHexagons() {
