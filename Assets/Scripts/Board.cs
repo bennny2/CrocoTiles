@@ -78,6 +78,7 @@ public class Board : MonoBehaviour
     private Trie _trie = new();
     private bool _team1Turn = true;
     private int _shuffleCounter = 0;
+    private bool _shouldCPUWaitForShuffle = false;
 
     // Hexagon State Properties
 
@@ -118,6 +119,7 @@ public class Board : MonoBehaviour
     public GameObject BonusReminder { get => _bonusReminder; set => _bonusReminder = value; }
     public GameObject AutoShufflePopup { get => _autoShufflePopup; set => _autoShufflePopup = value; }
     public GameObject BoardInteractionBlocker { get => _boardInteractionBlocker; set => _boardInteractionBlocker = value; }
+    public bool ShouldCPUWaitForShuffle { get => _shouldCPUWaitForShuffle; set => _shouldCPUWaitForShuffle = value; }
 
     // Class Methods
 
@@ -145,7 +147,10 @@ public class Board : MonoBehaviour
 
     private void ActivateCPUsTurn() {
         BoardInteractionBlocker.SetActive(true);
-        PlayCPUsWordOnBoard(GenerateCPUsWord());
+        if (!ShouldCPUWaitForShuffle) {
+            PlayCPUsWordOnBoard(GenerateCPUsWord());  
+        }
+        
     }
 
     private void ChangeTurn() { 
@@ -160,6 +165,7 @@ public class Board : MonoBehaviour
         if (ShuffleCounter < 10) {
             ShuffleCounter += 1;
         } else {
+            ShouldCPUWaitForShuffle = true;
             StartCoroutine(ShufflePopup2Seconds());
             ShuffleCounter = 0;
         }
@@ -167,6 +173,7 @@ public class Board : MonoBehaviour
 
     private void CheckBoardIsPlayable() {
         if (!Trie.CanFormValidWord(AllHexagons)) {
+            ShouldCPUWaitForShuffle = true;
             StartCoroutine(ShufflePopup2Seconds());
         }
     }
@@ -286,7 +293,7 @@ public class Board : MonoBehaviour
         List<Hexagon> result = new();
         List<Hexagon> neutralHexes = new(AllHexagons.Where(hex => hex.HexagonCurrentState == "neutral"));
 
-        for (int length = 3; length <= 6; length++) {
+        for (int length = 4; length <= 7; length++) {
             IEnumerable<IEnumerable<Hexagon>> hexPermutationsEnumerable = Trie.GetPermutationsWithDuplicates(neutralHexes, length);
             List<List<Hexagon>> hexPermutationsList = hexPermutationsEnumerable
                 .Select(innerSequence => innerSequence.ToList())
@@ -694,6 +701,8 @@ public class Board : MonoBehaviour
         yield return new WaitForSeconds(2);
         ShuffleLetters();
         AutoShufflePopup.SetActive(false);
+        ShouldCPUWaitForShuffle = false;
+        CheckIfIsCPUTurn();
     }
     private bool ShouldMakeNeutralForTeam1(string hexState) {
         return hexState != "homeTeam1" && hexState != "territoryTeam1" && hexState != "pressedTeam1";
