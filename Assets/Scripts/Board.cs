@@ -145,8 +145,7 @@ public class Board : MonoBehaviour
 
     private void ActivateCPUsTurn() {
         BoardInteractionBlocker.SetActive(true);
-        GenerateCPUsWord();
-        PlayCPUsWordOnBoard();
+        PlayCPUsWordOnBoard(GenerateCPUsWord());
     }
 
     private void ChangeTurn() { 
@@ -283,8 +282,27 @@ public class Board : MonoBehaviour
         BoardInteractionBlocker.SetActive(false);
     }
 
-    private void GenerateCPUsWord() {
+    private List<Hexagon> GenerateCPUsWord() {
+        List<Hexagon> result = new();
+        List<Hexagon> neutralHexes = new(AllHexagons.Where(hex => hex.HexagonCurrentState == "neutral"));
 
+        return GenereateWordForCPUFromLetters(neutralHexes);
+    }
+
+    private List<Hexagon> GenereateWordForCPUFromLetters(List<Hexagon> neutralHexes) {
+        for (int length = 3; length <= 5; length++) {
+            List<string> permutations = Trie.GetPermutationsWithDuplicates(neutralHexes, length).Select(perm => string.Join("", perm)).ToList();
+
+            foreach (string potentialWord in permutations) {
+                if (Trie.Search(potentialWord)) {
+                    //Debug.Log(potentialWord);
+                    return true;
+                }
+            }
+        }
+
+        List<Hexagon> ListOfHexesToPlay = new();
+        return ListOfHexesToPlay;
     }
 
     private HexagonStates GetCurrentTeam() {
@@ -506,8 +524,10 @@ public class Board : MonoBehaviour
         Team1Turn = true;
     }
 
-    private void PlayCPUsWordOnBoard() {
-
+    private void PlayCPUsWordOnBoard(List<Hexagon> Hexes) {
+        foreach (Hexagon hex in Hexes) {
+            HexagonPressed(hex);
+        }
     }
 
     private void ProcessGlowingHexagons() {
