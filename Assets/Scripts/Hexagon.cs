@@ -25,6 +25,7 @@ public class Hexagon : MonoBehaviour
     public const int HORIZONTALOFFSET = 70; 
     public const int VERTICALOFFSET = 80; 
     public const int VERTICALDIAGONALOFFSET = 40; 
+    private int _hexagonScore = 0;
 
     // Properties
 
@@ -52,6 +53,7 @@ public class Hexagon : MonoBehaviour
         get => _hexagonZ;
         set => _hexagonZ = value;
     }
+    public int HexagonScore { get => _hexagonScore; set => _hexagonScore = value; }
 
     // Class Methods
 

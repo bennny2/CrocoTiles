@@ -148,9 +148,13 @@ public class Board : MonoBehaviour
     private void ActivateCPUsTurn() {
         BoardInteractionBlocker.SetActive(true);
         if (!ShouldCPUWaitForShuffle) {
-            PlayCPUsWordOnBoard(GenerateCPUsWord());  
+           StartCoroutine(WaitBeforeFindingWord());  
         }
-        
+    }
+
+    IEnumerator WaitBeforeFindingWord() {
+        yield return new WaitForSeconds(1);
+        PlayCPUsWordOnBoard(GenerateCPUsWord());
     }
 
     private void ChangeTurn() { 
@@ -290,16 +294,14 @@ public class Board : MonoBehaviour
     }
 
     private List<Hexagon> GenerateCPUsWord() {
-        List<Hexagon> result = new();
         List<Hexagon> neutralHexes = new(AllHexagons.Where(hex => hex.HexagonCurrentState == "neutral"));
 
-        for (int length = 4; length <= 7; length++) {
+        for (int length = UnityEngine.Random.Range(3, 6); length <= 6; length++) {
             IEnumerable<IEnumerable<Hexagon>> hexPermutationsEnumerable = Trie.GetPermutationsWithDuplicates(neutralHexes, length);
             List<List<Hexagon>> hexPermutationsList = hexPermutationsEnumerable
                 .Select(innerSequence => innerSequence.ToList())
                 .ToList();
 
-            UnityEngine.Random.InitState(DateTime.Now.Millisecond);
             hexPermutationsList = hexPermutationsList.OrderBy(x => UnityEngine.Random.Range(0, 1000)).ToList();
 
             foreach (List<Hexagon> permutation in hexPermutationsList) {
@@ -311,7 +313,9 @@ public class Board : MonoBehaviour
                     return permutation;
                 } 
             }
-            Debug.Log("CPU could not find a word to play");
+            if (length == 6) {
+                length = 3;
+            }
         }
 
         List<Hexagon> ListOfHexesToPlay = new();
