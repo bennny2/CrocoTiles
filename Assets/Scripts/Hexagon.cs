@@ -81,10 +81,27 @@ public class Hexagon : MonoBehaviour
 
             if (touchingHexagon != null) {
                 touchingHexagonsArray.Add(touchingHexagon);
-
             }
         }
         return touchingHexagonsArray;
+    }
+
+    public bool FindIfThereIsATouchingHexagonOfType(string targetStateType) {
+        int[] horizontalOffsets = { 0, HORIZONTALOFFSET, HORIZONTALOFFSET, 0, -HORIZONTALOFFSET, -HORIZONTALOFFSET};
+        int[] verticalOffsets = { VERTICALOFFSET, VERTICALDIAGONALOFFSET, -VERTICALDIAGONALOFFSET, -VERTICALOFFSET, -VERTICALDIAGONALOFFSET, VERTICALDIAGONALOFFSET  };
+
+        for (int i = 0; i < 6; i++) { 
+        
+            float targetX = this.HexagonX + horizontalOffsets[i];
+            float targetY = this.HexagonY + verticalOffsets[i];
+
+            Hexagon touchingHexagon = _boardObject.AllHexagons.FirstOrDefault(h => h.HexagonX == targetX && h.HexagonY == targetY);
+
+            if (touchingHexagon != null && touchingHexagon.HexagonCurrentState == targetStateType) {
+                return true;
+            }
+        }
+        return false;
     } 
 
     void InitilizeComponents() {

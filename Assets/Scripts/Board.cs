@@ -293,11 +293,34 @@ public class Board : MonoBehaviour
         BoardInteractionBlocker.SetActive(false);
     }
 
-    private List<Hexagon> GenerateCPUsWord() {
+    private List<Hexagon> FindScoringHexes() {
         List<Hexagon> neutralHexes = new(AllHexagons.Where(hex => hex.HexagonCurrentState == "neutral"));
+        GenerateHexagonScores(neutralHexes);
+
+        /*
+        switch (PlayerPrefs.GetString("Difficulty", "Medium")) 
+        {
+            case "Easy":
+                
+                break;
+            case "Medium":
+                
+                break;
+            case "Hard":
+                
+                break;
+            
+        }
+        */
+        
+        return neutralHexes;
+    }
+
+    private List<Hexagon> GenerateCPUsWord() {
+        List<Hexagon> scoringHexes = new(FindScoringHexes());
 
         for (int length = UnityEngine.Random.Range(3, 6); length <= 6; length++) {
-            IEnumerable<IEnumerable<Hexagon>> hexPermutationsEnumerable = Trie.GetPermutationsWithDuplicates(neutralHexes, length);
+            IEnumerable<IEnumerable<Hexagon>> hexPermutationsEnumerable = Trie.GetPermutationsWithDuplicates(scoringHexes, length);
             List<List<Hexagon>> hexPermutationsList = hexPermutationsEnumerable
                 .Select(innerSequence => innerSequence.ToList())
                 .ToList();
@@ -322,12 +345,46 @@ public class Board : MonoBehaviour
         return ListOfHexesToPlay;
     }
 
+    private void GenerateHexagonScores(List<Hexagon> neutralHexes) {
+        foreach (Hexagon hex in neutralHexes) {
+            if (hex.FindIfThereIsATouchingHexagonOfType(GetMyHomeState()) && hex.FindIfThereIsATouchingHexagonOfType(GetOpponentTerritoryState()) || 
+                hex.FindIfThereIsATouchingHexagonOfType(GetMyTerritoryState()) && hex.FindIfThereIsATouchingHexagonOfType(GetOpponentHomeState())) {
+                hex.HexagonScore = 10;
+                break;
+            }
+            if (hex.FindIfThereIsATouchingHexagonOfType(GetMyHomeState())) {
+                hex.HexagonScore = 5;
+            }
+            if (hex.FindIfThereIsATouchingHexagonOfType(GetMyTerritoryState())) {
+                hex.HexagonScore = 3;
+            }
+            if (hex.FindIfThereIsATouchingHexagonOfType(GetOpponentTerritoryState())) {
+                hex.HexagonScore = 3;
+            }
+            if (hex.FindIfThereIsATouchingHexagonOfType(GetOpponentTerritoryState())) {
+                hex.HexagonScore = 1;
+            }
+        }
+    }
+
     private HexagonStates GetCurrentTeam() {
         return Team1Turn ? PressedTeam1 : PressedTeam2;
     }
 
-    private string GetOpponentHomeState(string hexState) {
+    private string GetOpponentHomeState() {
         return Team1Turn ? "homeTeam2" : "homeTeam1";
+    }
+
+    private string GetOpponentTerritoryState() {
+        return Team1Turn ? "territoryTeam2" : "territoryTeam1";
+    }
+
+    private string GetMyHomeState() {
+        return Team1Turn ? "homeTeam1" : "homeTeam2";
+    }
+
+    private string GetMyTerritoryState() {
+        return Team1Turn ? "territoryTeam1" : "territoryTeam2";
     }
 
     private void HasWon() {
@@ -521,7 +578,7 @@ public class Board : MonoBehaviour
                     BonusReminder.SetActive(true);
                     BonusTurnActive = true;
                     touchingHexagon.SetLetter();
-                    SetNewHome(GetOpponentHomeState(hexState));
+                    SetNewHome(GetOpponentHomeState());
                 }
             }
         }
