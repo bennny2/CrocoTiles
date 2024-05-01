@@ -293,7 +293,7 @@ public class Board : MonoBehaviour
         BoardInteractionBlocker.SetActive(false);
     }
 
-    private List<Hexagon> FindScoringHexes() {
+    private List<Hexagon> UpdateHexagonsScores() {
         List<Hexagon> neutralHexes = new(AllHexagons.Where(hex => hex.HexagonCurrentState == "neutral"));
         GenerateHexagonScores(neutralHexes);
 
@@ -317,10 +317,41 @@ public class Board : MonoBehaviour
     }
 
     private List<Hexagon> GenerateCPUsWord() {
-        List<Hexagon> scoringHexes = new(FindScoringHexes());
+        List<Hexagon> scoredHexes = new(UpdateHexagonsScores());
+        List<List<Hexagon>> hexagonPermutationsContainingValidWord = new();
+        List<Hexagon> ListOfHexesToPlay = new();
 
-        for (int length = UnityEngine.Random.Range(3, 6); length <= 6; length++) {
-            IEnumerable<IEnumerable<Hexagon>> hexPermutationsEnumerable = Trie.GetPermutationsWithDuplicates(scoringHexes, length);
+        int length = 0;
+        int difficultyValue = 0;
+
+        switch (PlayerPrefs.GetString("Difficulty", "Medium")) 
+        {
+            case "Easy":
+                length = UnityEngine.Random.Range(3, 4);
+                difficultyValue = 0;
+                break;
+            case "Medium":
+                length = UnityEngine.Random.Range(3, 6);
+                difficultyValue = 1;
+                break;
+            case "Hard":
+                length = UnityEngine.Random.Range(4, 7);
+                difficultyValue = 2;
+                break;
+        }
+
+        for (; length <= 7; length++) {
+
+            //create groups of length "length" filtered by appropriate score, validate with cantheselettersmakeword, then give that to getpermutations
+
+            hexagonPermutationsContainingValidWord.Add(GenerateCPUsPotentialWord(scoredHexes, length));
+        }
+
+        return ListOfHexesToPlay;
+    }
+
+    private List<Hexagon> GenerateCPUsPotentialWord(List<Hexagon> subsetOfScoredHexes, int length) {
+        IEnumerable<IEnumerable<Hexagon>> hexPermutationsEnumerable = Trie.GetPermutationsWithDuplicates(subsetOfScoredHexes, length);
             List<List<Hexagon>> hexPermutationsList = hexPermutationsEnumerable
                 .Select(innerSequence => innerSequence.ToList())
                 .ToList();
@@ -339,10 +370,11 @@ public class Board : MonoBehaviour
             if (length == 6) {
                 length = 3;
             }
-        }
+        
+        return subsetOfScoredHexes;
+        
+        //instead of returning subsetOfScoringHexes, return false/no word found and so no list of hexagons to add
 
-        List<Hexagon> ListOfHexesToPlay = new();
-        return ListOfHexesToPlay;
     }
 
     private void GenerateHexagonScores(List<Hexagon> neutralHexes) {
