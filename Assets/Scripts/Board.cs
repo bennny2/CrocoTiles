@@ -223,6 +223,80 @@ public class Board : MonoBehaviour
         }
     }
 
+    private List<Hexagon> ChooseCPUsWordBasedOnScore(List<List<Hexagon>> hexagonPermutationsContainingValidWord, int difficultyValue) {
+        int[] scores = new int[hexagonPermutationsContainingValidWord.Count];
+        int counter = 0;
+        foreach (List<Hexagon> permutation in hexagonPermutationsContainingValidWord) {
+            int wordScore = 0;
+            foreach (Hexagon hex in permutation) {
+                wordScore += hex.HexagonScore;
+            }
+            scores[counter] = wordScore;
+            counter += 1;
+        }   
+        int chosenWord = 0; 
+        switch (difficultyValue)
+        {
+            case 0:
+                chosenWord = FindIndexOfMin(scores);
+                break;
+            case 1:
+                chosenWord = FindIndexOfMiddle(scores);
+                break;
+            case 2:
+                chosenWord = FindIndexOfMax(scores);
+                break;
+        }
+        return hexagonPermutationsContainingValidWord[chosenWord];
+    }
+
+    public int FindIndexOfMax(int[] array) {
+        int maxIndex = 0; 
+        int maxValue = array[0]; 
+
+        for (int i = 1; i < array.Length; i++) {
+            if (array[i] > maxValue) {
+                maxValue = array[i];
+                maxIndex = i;
+            }
+        }
+
+        return maxIndex;
+    }
+    public static int FindIndexOfMin(int[] array)
+    {
+        if (array == null || array.Length == 0)
+        {
+            throw new ArgumentException("Array is null or empty");
+        }
+
+        int minIndex = 0; 
+        int minValue = array[0]; 
+
+        for (int i = 1; i < array.Length; i++)
+        {
+            if (array[i] < minValue)
+            {
+                minValue = array[i];
+                minIndex = i;
+            }
+        }
+
+        return minIndex;
+    }
+
+    public static int FindIndexOfMiddle(int[] array)
+    {
+        if (array == null || array.Length == 0)
+        {
+            throw new ArgumentException("Array is null or empty");
+        }
+
+        int middleIndex = array.Length / 2;
+
+        return middleIndex;
+    }
+
     private void ClearHexagon(Hexagon hex) {
         hex.DeleteLetter();
         hex.SetHexagonState(Neutral);
@@ -296,23 +370,6 @@ public class Board : MonoBehaviour
     private List<Hexagon> UpdateHexagonsScores() {
         List<Hexagon> neutralHexes = new(AllHexagons.Where(hex => hex.HexagonCurrentState == "neutral"));
         GenerateHexagonScores(neutralHexes);
-
-        /*
-        switch (PlayerPrefs.GetString("Difficulty", "Medium")) 
-        {
-            case "Easy":
-                
-                break;
-            case "Medium":
-                
-                break;
-            case "Hard":
-                
-                break;
-            
-        }
-        */
-        
         return neutralHexes;
     }
 
@@ -321,31 +378,47 @@ public class Board : MonoBehaviour
         List<List<Hexagon>> hexagonPermutationsContainingValidWord = new();
         List<Hexagon> ListOfHexesToPlay = new();
 
-        int length = 0;
+        int cPUTargetWordLength = 0;
         int difficultyValue = 0;
 
         switch (PlayerPrefs.GetString("Difficulty", "Medium")) 
         {
             case "Easy":
-                length = UnityEngine.Random.Range(3, 4);
+                cPUTargetWordLength = UnityEngine.Random.Range(3, 4);
                 difficultyValue = 0;
                 break;
             case "Medium":
-                length = UnityEngine.Random.Range(3, 6);
+                cPUTargetWordLength = UnityEngine.Random.Range(3, 6);
                 difficultyValue = 1;
                 break;
             case "Hard":
-                length = UnityEngine.Random.Range(4, 7);
+                cPUTargetWordLength = UnityEngine.Random.Range(4, 7);
                 difficultyValue = 2;
                 break;
         }
 
-        for (; length <= 7; length++) {
+        for (; cPUTargetWordLength <= 7; cPUTargetWordLength++) {
+            foreach (Hexagon hex in scoredHexes) {
 
-            //create groups of length "length" filtered by appropriate score, validate with cantheselettersmakeword, then give that to getpermutations
+                List<Hexagon> shuffledHexagons = scoredHexes.OrderBy(x => UnityEngine.Random.Range(0, 1000)).ToList();
+                List<Hexagon> hexagonSubset = shuffledHexagons.Take(cPUTargetWordLength + 1).ToList();                        
+                
+                hexagonPermutationsContainingValidWord.Add(GenerateCPUsPotentialWord(scoredHexes, cPUTargetWordLength));
+                if (hexagonPermutationsContainingValidWord.Count > 5) {
+                    break;
+                }
+            }
 
-            hexagonPermutationsContainingValidWord.Add(GenerateCPUsPotentialWord(scoredHexes, length));
+            if (hexagonPermutationsContainingValidWord.Count > 5) {
+                break;
+            }
+
+            if (cPUTargetWordLength == 7) {
+                cPUTargetWordLength = 3;
+            }
         }
+
+        ListOfHexesToPlay = ChooseCPUsWordBasedOnScore(hexagonPermutationsContainingValidWord, difficultyValue);
 
         return ListOfHexesToPlay;
     }
@@ -370,11 +443,7 @@ public class Board : MonoBehaviour
             if (length == 6) {
                 length = 3;
             }
-        
-        return subsetOfScoredHexes;
-        
-        //instead of returning subsetOfScoringHexes, return false/no word found and so no list of hexagons to add
-
+        return null;
     }
 
     private void GenerateHexagonScores(List<Hexagon> neutralHexes) {
