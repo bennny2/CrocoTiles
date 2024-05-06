@@ -375,8 +375,6 @@ public class Board : MonoBehaviour
 
     private List<Hexagon> GenerateCPUsWord() {
         List<Hexagon> scoredHexes = new(UpdateHexagonsScores());
-        List<List<Hexagon>> hexagonPermutationsContainingValidWord = new();
-        List<Hexagon> ListOfHexesToPlay = new();
 
         int cPUTargetWordLength = 0;
         int difficultyValue = 0;
@@ -384,66 +382,59 @@ public class Board : MonoBehaviour
         switch (PlayerPrefs.GetString("Difficulty", "Medium")) 
         {
             case "Easy":
-                cPUTargetWordLength = UnityEngine.Random.Range(3, 4);
+                cPUTargetWordLength = UnityEngine.Random.Range(3, 5);
                 difficultyValue = 0;
                 break;
             case "Medium":
-                cPUTargetWordLength = UnityEngine.Random.Range(3, 6);
+                cPUTargetWordLength = UnityEngine.Random.Range(3, 7);
                 difficultyValue = 1;
                 break;
             case "Hard":
-                cPUTargetWordLength = UnityEngine.Random.Range(4, 7);
+                cPUTargetWordLength = UnityEngine.Random.Range(4, 9);
                 difficultyValue = 2;
                 break;
         }
-
-        for (; cPUTargetWordLength <= 7; cPUTargetWordLength++) {
-            foreach (Hexagon hex in scoredHexes) {
-
-                List<Hexagon> shuffledHexagons = scoredHexes.OrderBy(x => UnityEngine.Random.Range(0, 1000)).ToList();
-                List<Hexagon> hexagonSubset = shuffledHexagons.Take(cPUTargetWordLength + 1).ToList();                        
-                
-                hexagonPermutationsContainingValidWord.Add(GenerateCPUsPotentialWord(scoredHexes, cPUTargetWordLength));
-                if (hexagonPermutationsContainingValidWord.Count > 5) {
-                    break;
-                }
-            }
-
-            if (hexagonPermutationsContainingValidWord.Count > 5) {
-                break;
-            }
-
-            if (cPUTargetWordLength == 7) {
+        List<string> validWordListForCPU = new();
+        while (validWordListForCPU.Count == 0)
+        {
+            if (cPUTargetWordLength >= scoredHexes.Count) {
                 cPUTargetWordLength = 3;
             }
+            validWordListForCPU = new(Trie.GenerateWordsFromGameObjects(scoredHexes, cPUTargetWordLength));
+            cPUTargetWordLength += 1;
         }
 
-        ListOfHexesToPlay = ChooseCPUsWordBasedOnScore(hexagonPermutationsContainingValidWord, difficultyValue);
+        List<List<Hexagon>> hexagonPermutationsContainingValidWord = new(FindHexagonsAttachedToLettersForCPUToPlay(validWordListForCPU, scoredHexes));
+
+        List<Hexagon> ListOfHexesToPlay = ChooseCPUsWordBasedOnScore(hexagonPermutationsContainingValidWord, difficultyValue);
 
         return ListOfHexesToPlay;
     }
 
-    private List<Hexagon> GenerateCPUsPotentialWord(List<Hexagon> subsetOfScoredHexes, int length) {
-        IEnumerable<IEnumerable<Hexagon>> hexPermutationsEnumerable = Trie.GetPermutationsWithDuplicates(subsetOfScoredHexes, length);
-            List<List<Hexagon>> hexPermutationsList = hexPermutationsEnumerable
-                .Select(innerSequence => innerSequence.ToList())
-                .ToList();
+    private List<List<Hexagon>> FindHexagonsAttachedToLettersForCPUToPlay(List<string> validWordListForCPU, List<Hexagon> scoredHexes) {
+        List<List<Hexagon>> hexagonPermutationsContainingValidWord = new();
+        foreach (string word in validWordListForCPU) {
+            Debug.Log("potential word is: " + word);
+            List<Hexagon> hexagonPermutation = new();
+            List<char> lettersInWord = word.ToList();
 
-            hexPermutationsList = hexPermutationsList.OrderBy(x => UnityEngine.Random.Range(0, 1000)).ToList();
+            foreach (char letter in lettersInWord) {
+                var highestScoredHexagon = scoredHexes
+                .Where(x => x.HexagonText.text == letter.ToString())
+                .OrderByDescending(x => x.HexagonScore)
+                .FirstOrDefault();
 
-            foreach (List<Hexagon> permutation in hexPermutationsList) {
-                string word = "";
-                foreach (Hexagon hex in permutation) {
-                    word += hex.HexagonText.text;
+                if (highestScoredHexagon != null) {
+                    hexagonPermutation.Add(highestScoredHexagon);
+                    scoredHexes.Remove(highestScoredHexagon);
                 }
-                if (Trie.Search(word)) {
-                    return permutation;
-                } 
+
             }
-            if (length == 6) {
-                length = 3;
-            }
-        return null;
+
+            hexagonPermutationsContainingValidWord.Add(hexagonPermutation);
+        }
+
+        return hexagonPermutationsContainingValidWord;
     }
 
     private void GenerateHexagonScores(List<Hexagon> neutralHexes) {

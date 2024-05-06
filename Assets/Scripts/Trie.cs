@@ -94,6 +94,65 @@ class Trie
         }
         return node;
     }
+    public List<string> GenerateWordsFromGameObjects(List<Hexagon> scoredHexes, int wordLength)
+    {
+        List<string> letters = new List<string>();
+        foreach (Hexagon hex in scoredHexes)
+        {
+            if (!string.IsNullOrWhiteSpace(hex.HexagonText.text))
+            {
+                letters.Add(hex.HexagonText.text); 
+            }
+        }
+        return GenerateWordsFromLetters(letters, wordLength);
+    }
+
+    private List<string> GenerateWordsFromLetters(List<string> letters, int wordLength)
+    {
+        List<string> validWords = new List<string>();
+        List<char> word = new List<char>();
+        bool[] used = new bool[letters.Count];
+
+        GenerateWordsHelper(letters, used, _root, word, validWords, wordLength);
+
+        return validWords;
+    }
+
+    private void GenerateWordsHelper(List<string> letters, bool[] used, TrieNode node, List<char> word, List<string> validWords, int wordLength)
+    {
+        if (validWords.Count >= 15)
+            return; 
+
+        if (word.Count == wordLength)
+        {
+            if (node.IsEndOfWord)
+            {
+                validWords.Add(new string(word.ToArray())); 
+            }
+            return;
+        }
+
+        for (int i = 0; i < letters.Count; i++)
+        {
+            if (!used[i])
+            {
+                char letter = letters[i][0];
+                int index = letter - 'a';
+
+                if (node.Children[index] != null)
+                {
+                    used[i] = true;
+                    word.Add(letter);
+                    GenerateWordsHelper(letters, used, node.Children[index], word, validWords, wordLength);
+                    word.RemoveAt(word.Count - 1);
+                    used[i] = false;
+
+                    if (validWords.Count >= 10)
+                        return; 
+                }
+            }
+        }
+    }
     
     public IEnumerable<IEnumerable<T>> GetPermutationsWithDuplicates<T>(IEnumerable<T> list, int length) {
 
