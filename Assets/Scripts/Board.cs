@@ -143,6 +143,7 @@ public class Board : MonoBehaviour
         if (Input.GetMouseButtonDown(1) && (PlayerPrefs.GetString("GameType", "Local") == "Local" || Team1Turn)) {
             ClearWord();
         }
+        ProcessGlowingHexagons();
     }
 
     private void ActivateCPUsTurn() {
@@ -247,6 +248,13 @@ public class Board : MonoBehaviour
                 chosenWord = FindIndexOfMax(scores);
                 break;
         }
+
+        string x = "";
+        foreach (Hexagon hex in hexagonPermutationsContainingValidWord[chosenWord])
+        {
+            x += hex.HexagonText.text;
+        }
+        Debug.Log(x);
         return hexagonPermutationsContainingValidWord[chosenWord];
     }
 
@@ -394,6 +402,7 @@ public class Board : MonoBehaviour
                 difficultyValue = 2;
                 break;
         }
+
         List<string> validWordListForCPU = new();
         while (validWordListForCPU.Count == 0)
         {
@@ -403,6 +412,8 @@ public class Board : MonoBehaviour
             validWordListForCPU = new(Trie.GenerateWordsFromGameObjects(scoredHexes, cPUTargetWordLength));
             cPUTargetWordLength += 1;
         }
+        // working above
+
 
         List<List<Hexagon>> hexagonPermutationsContainingValidWord = new(FindHexagonsAttachedToLettersForCPUToPlay(validWordListForCPU, scoredHexes));
 
@@ -410,16 +421,16 @@ public class Board : MonoBehaviour
 
         return ListOfHexesToPlay;
     }
-
+    
+    /*
     private List<List<Hexagon>> FindHexagonsAttachedToLettersForCPUToPlay(List<string> validWordListForCPU, List<Hexagon> scoredHexes) {
         List<List<Hexagon>> hexagonPermutationsContainingValidWord = new();
         foreach (string word in validWordListForCPU) {
-            Debug.Log("potential word is: " + word);
             List<Hexagon> hexagonPermutation = new();
             List<char> lettersInWord = word.ToList();
 
             foreach (char letter in lettersInWord) {
-                var highestScoredHexagon = scoredHexes
+                Hexagon highestScoredHexagon = scoredHexes
                 .Where(x => x.HexagonText.text == letter.ToString())
                 .OrderByDescending(x => x.HexagonScore)
                 .FirstOrDefault();
@@ -436,25 +447,59 @@ public class Board : MonoBehaviour
 
         return hexagonPermutationsContainingValidWord;
     }
+    */
+    private List<List<Hexagon>> FindHexagonsAttachedToLettersForCPUToPlay(List<string> validWordListForCPU, List<Hexagon> scoredHexes) {
+        List<List<Hexagon>> hexagonPermutationsContainingValidWord = new();
+
+        foreach (string word in validWordListForCPU) {
+            List<Hexagon> hexagonsCopy = new List<Hexagon>(scoredHexes);
+            List<Hexagon> hexagonPermutation = new List<Hexagon>();
+            List<char> lettersInWord = word.ToList();
+
+            foreach (char letter in lettersInWord) {
+                Hexagon highestScoredHexagon = hexagonsCopy
+                    .Where(x => x.HexagonText.text == letter.ToString())
+                    .OrderByDescending(x => x.HexagonScore)
+                    .FirstOrDefault();
+
+                if (highestScoredHexagon != null) {
+                    hexagonPermutation.Add(highestScoredHexagon);
+                    hexagonsCopy.Remove(highestScoredHexagon);
+                }
+            }
+
+            hexagonPermutationsContainingValidWord.Add(hexagonPermutation);
+        }
+
+        return hexagonPermutationsContainingValidWord;
+    }
+
 
     private void GenerateHexagonScores(List<Hexagon> neutralHexes) {
+        foreach (Hexagon hex in AllHexagons) {
+            hex.HexagonScoreText.text = "";
+        }
         foreach (Hexagon hex in neutralHexes) {
+            hex.HexagonScore = 0;
             if (hex.FindIfThereIsATouchingHexagonOfType(GetMyHomeState()) && hex.FindIfThereIsATouchingHexagonOfType(GetOpponentTerritoryState()) || 
                 hex.FindIfThereIsATouchingHexagonOfType(GetMyTerritoryState()) && hex.FindIfThereIsATouchingHexagonOfType(GetOpponentHomeState())) {
-                hex.HexagonScore = 10;
+                hex.HexagonScore += 30;
                 break;
             }
             if (hex.FindIfThereIsATouchingHexagonOfType(GetMyHomeState())) {
-                hex.HexagonScore = 5;
+                hex.HexagonScore += 12;
+            }
+            if (hex.FindIfThereIsATouchingHexagonOfType(GetMyTerritoryState()) && hex.FindIfThereIsATouchingHexagonOfType(GetOpponentTerritoryState())) {
+                hex.HexagonScore += 9;
             }
             if (hex.FindIfThereIsATouchingHexagonOfType(GetMyTerritoryState())) {
-                hex.HexagonScore = 3;
+                hex.HexagonScore += 3;
+            }
+            if (hex.FindIfThereIsATouchingHexagonOfType(GetOpponentHomeState())) {
+                hex.HexagonScore += 3;
             }
             if (hex.FindIfThereIsATouchingHexagonOfType(GetOpponentTerritoryState())) {
-                hex.HexagonScore = 3;
-            }
-            if (hex.FindIfThereIsATouchingHexagonOfType(GetOpponentTerritoryState())) {
-                hex.HexagonScore = 1;
+                hex.HexagonScore += 1;
             }
         }
     }
@@ -762,6 +807,8 @@ public class Board : MonoBehaviour
         AudioWordSubmit.Play();
         ProcessGlowingHexagons();
         CheckIfAllLettersOnBoardShouldBeShuffled();
+        List<Hexagon> neutralHexes = new(AllHexagons.Where(x => x.HexagonCurrentState == "neutral").ToList());
+        GenerateHexagonScores(neutralHexes);
         CheckIfIsCPUTurn();
     }
 

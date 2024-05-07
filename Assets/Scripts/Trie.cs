@@ -96,7 +96,7 @@ class Trie
     }
     public List<string> GenerateWordsFromGameObjects(List<Hexagon> scoredHexes, int wordLength)
     {
-        List<string> letters = new List<string>();
+        List<string> letters = new();
         foreach (Hexagon hex in scoredHexes)
         {
             if (!string.IsNullOrWhiteSpace(hex.HexagonText.text))
@@ -109,25 +109,32 @@ class Trie
 
     private List<string> GenerateWordsFromLetters(List<string> letters, int wordLength)
     {
-        List<string> validWords = new List<string>();
-        List<char> word = new List<char>();
+        List<string> validWords = new();
+        List<char> word = new();
         bool[] used = new bool[letters.Count];
+        HashSet<string> usedWords = new();
 
-        GenerateWordsHelper(letters, used, _root, word, validWords, wordLength);
-
+        GenerateWordsHelper(letters, used, _root, word, usedWords, validWords, wordLength);
+        
         return validWords;
     }
 
-    private void GenerateWordsHelper(List<string> letters, bool[] used, TrieNode node, List<char> word, List<string> validWords, int wordLength)
+    private void GenerateWordsHelper(List<string> letters, bool[] used, TrieNode node, List<char> word, HashSet<string> usedWords, List<string> validWords, int wordLength)
     {
         if (validWords.Count >= 15)
-            return; 
+            return;
 
         if (word.Count == wordLength)
         {
             if (node.IsEndOfWord)
             {
-                validWords.Add(new string(word.ToArray())); 
+                string newWord = new string(word.ToArray());
+                if (!usedWords.Contains(newWord))
+                {
+                    UnityEngine.Debug.Log(newWord);
+                    validWords.Add(newWord);
+                    usedWords.Add(newWord);
+                }
             }
             return;
         }
@@ -143,12 +150,12 @@ class Trie
                 {
                     used[i] = true;
                     word.Add(letter);
-                    GenerateWordsHelper(letters, used, node.Children[index], word, validWords, wordLength);
+                    GenerateWordsHelper(letters, used, node.Children[index], word, usedWords, validWords, wordLength);
                     word.RemoveAt(word.Count - 1);
                     used[i] = false;
 
-                    if (validWords.Count >= 10)
-                        return; 
+                    if (validWords.Count >= 15)
+                        return;
                 }
             }
         }

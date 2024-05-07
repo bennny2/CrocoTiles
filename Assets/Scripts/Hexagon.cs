@@ -12,6 +12,10 @@ public class Hexagon : MonoBehaviour
 
     [SerializeField]
     private string _hexagonCurrentState;
+    [SerializeField]
+    private TextMeshProUGUI _hexagonScoreText;
+    [SerializeField]
+    private int _hexagonScore = 0;
 
     // Fields
 
@@ -25,7 +29,6 @@ public class Hexagon : MonoBehaviour
     public const int HORIZONTALOFFSET = 70; 
     public const int VERTICALOFFSET = 80; 
     public const int VERTICALDIAGONALOFFSET = 40; 
-    private int _hexagonScore = 0;
 
     // Properties
 
@@ -53,7 +56,22 @@ public class Hexagon : MonoBehaviour
         get => _hexagonZ;
         set => _hexagonZ = value;
     }
-    public int HexagonScore { get => _hexagonScore; set => _hexagonScore = value; }
+    public int HexagonScore 
+    { 
+        get => _hexagonScore; 
+        set 
+        { 
+            _hexagonScore = value;
+            HexagonScoreText.text = value.ToString();
+        }
+    }
+
+    public TextMeshProUGUI HexagonScoreText 
+    { 
+        get => _hexagonScoreText; 
+        set => _hexagonScoreText = value; 
+    }
+
 
     // Class Methods
 
