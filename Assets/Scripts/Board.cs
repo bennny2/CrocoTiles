@@ -391,31 +391,37 @@ public class Board : MonoBehaviour
         switch (PlayerPrefs.GetString("Difficulty", "Medium")) 
         {
             case "Easy":
-                cPUTargetWordLength = UnityEngine.Random.Range(3, 5);
+                cPUTargetWordLength = UnityEngine.Random.Range(3, 6);
                 difficultyValue = 0;
                 break;
             case "Medium":
-                cPUTargetWordLength = UnityEngine.Random.Range(3, 7);
+                cPUTargetWordLength = UnityEngine.Random.Range(4, 10);
                 difficultyValue = 1;
                 break;
             case "Hard":
-                cPUTargetWordLength = UnityEngine.Random.Range(4, 9);
+                cPUTargetWordLength = scoredHexes.Count;
                 difficultyValue = 2;
                 break;
         }
 
         List<string> validWordListForCPU = new();
-        while (validWordListForCPU.Count == 0)
-        {
-            if (cPUTargetWordLength >= scoredHexes.Count) {
-                cPUTargetWordLength = 3;
+        if (difficultyValue == 2) {
+            while (validWordListForCPU.Count == 0)
+            {
+                validWordListForCPU = new(Trie.GenerateWordsFromGameObjects(scoredHexes, cPUTargetWordLength));
+                cPUTargetWordLength -= 1;
             }
-            validWordListForCPU = new(Trie.GenerateWordsFromGameObjects(scoredHexes, cPUTargetWordLength));
-            cPUTargetWordLength += 1;
+        } else {
+            while (validWordListForCPU.Count == 0)
+            {
+                if (cPUTargetWordLength >= scoredHexes.Count) {
+                    cPUTargetWordLength = 3;
+                }
+                validWordListForCPU = new(Trie.GenerateWordsFromGameObjects(scoredHexes, cPUTargetWordLength));
+                cPUTargetWordLength += 1;
+            }
         }
-        // working above
-
-
+       
         List<List<Hexagon>> hexagonPermutationsContainingValidWord = new(FindHexagonsAttachedToLettersForCPUToPlay(validWordListForCPU, scoredHexes));
 
         List<Hexagon> ListOfHexesToPlay = ChooseCPUsWordBasedOnScore(hexagonPermutationsContainingValidWord, difficultyValue);
