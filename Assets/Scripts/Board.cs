@@ -248,13 +248,14 @@ public class Board : MonoBehaviour
                 chosenWord = FindIndexOfMax(scores);
                 break;
         }
-
+/*
         string x = "";
         foreach (Hexagon hex in hexagonPermutationsContainingValidWord[chosenWord])
         {
             x += hex.HexagonText.text;
         }
         Debug.Log(x);
+        */
         return hexagonPermutationsContainingValidWord[chosenWord];
     }
 
@@ -477,14 +478,14 @@ public class Board : MonoBehaviour
 
     private void GenerateHexagonScores(List<Hexagon> neutralHexes) {
         foreach (Hexagon hex in AllHexagons) {
-            hex.HexagonScoreText.text = "";
+            hex.HexagonScoreText.text = ""; 
         }
         foreach (Hexagon hex in neutralHexes) {
             hex.HexagonScore = 0;
             if (hex.FindIfThereIsATouchingHexagonOfType(GetMyHomeState()) && hex.FindIfThereIsATouchingHexagonOfType(GetOpponentTerritoryState()) || 
                 hex.FindIfThereIsATouchingHexagonOfType(GetMyTerritoryState()) && hex.FindIfThereIsATouchingHexagonOfType(GetOpponentHomeState())) {
                 hex.HexagonScore += 30;
-                break;
+                continue;
             }
             if (hex.FindIfThereIsATouchingHexagonOfType(GetMyHomeState())) {
                 hex.HexagonScore += 12;

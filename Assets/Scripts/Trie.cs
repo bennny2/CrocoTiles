@@ -131,7 +131,7 @@ class Trie
                 string newWord = new string(word.ToArray());
                 if (!usedWords.Contains(newWord))
                 {
-                    UnityEngine.Debug.Log(newWord);
+                    //UnityEngine.Debug.Log(newWord);
                     validWords.Add(newWord);
                     usedWords.Add(newWord);
                 }
