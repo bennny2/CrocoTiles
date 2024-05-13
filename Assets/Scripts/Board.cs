@@ -79,6 +79,7 @@ public class Board : MonoBehaviour
     private bool _team1Turn = true;
     private int _shuffleCounter = 0;
     private bool _shouldCPUWaitForShuffle = false;
+    private bool _gameFinished = false;
 
     // Hexagon State Properties
 
@@ -120,6 +121,8 @@ public class Board : MonoBehaviour
     public GameObject AutoShufflePopup { get => _autoShufflePopup; set => _autoShufflePopup = value; }
     public GameObject BoardInteractionBlocker { get => _boardInteractionBlocker; set => _boardInteractionBlocker = value; }
     public bool ShouldCPUWaitForShuffle { get => _shouldCPUWaitForShuffle; set => _shouldCPUWaitForShuffle = value; }
+    public bool GameFinished { get => _gameFinished; set => _gameFinished = value; }
+
 
     // Class Methods
 
@@ -147,6 +150,7 @@ public class Board : MonoBehaviour
     }
 
     private void ActivateCPUsTurn() {
+        BonusReminder.SetActive(false);
         BoardInteractionBlocker.SetActive(true);
         if (!ShouldCPUWaitForShuffle) {
            StartCoroutine(WaitBeforeFindingWord());  
@@ -177,7 +181,7 @@ public class Board : MonoBehaviour
     }
 
     private void CheckBoardIsPlayable() {
-        if (!Trie.CanFormValidWord(AllHexagons)) {
+        if (!Trie.CanFormValidWord(AllHexagons) && GameFinished == false) {
             ShouldCPUWaitForShuffle = true;
             StartCoroutine(ShufflePopup2Seconds());
         }
@@ -215,7 +219,7 @@ public class Board : MonoBehaviour
             case "Local":
                 return;
             case "CPU":
-                if (!Team1Turn) {
+                if (!Team1Turn && GameFinished == false) {
                     ActivateCPUsTurn();
                 } else {
                     DeactivateCPUsTurn();
@@ -491,7 +495,6 @@ public class Board : MonoBehaviour
             if (hex.FindIfThereIsATouchingHexagonOfType(GetMyHomeState()) && hex.FindIfThereIsATouchingHexagonOfType(GetOpponentTerritoryState()) || 
                 hex.FindIfThereIsATouchingHexagonOfType(GetMyTerritoryState()) && hex.FindIfThereIsATouchingHexagonOfType(GetOpponentHomeState())) {
                 hex.HexagonScore += 30;
-                continue;
             }
             if (hex.FindIfThereIsATouchingHexagonOfType(GetMyHomeState())) {
                 hex.HexagonScore += 12;
@@ -532,6 +535,7 @@ public class Board : MonoBehaviour
     }
 
     private void HasWon() {
+        GameFinished = true;
         BonusReminder.SetActive(false);
         if (!Team1Turn) {
             WinnerBlockText.text = "Team 1 has Won!";
@@ -729,6 +733,7 @@ public class Board : MonoBehaviour
     }
 
     private void PlayAgain() { //referenced by button in game
+        GameFinished = false;
         WinnerBlock.SetActive(false);
         PlayAgainButton.gameObject.SetActive(false);
         QuitButton.gameObject.SetActive(false);
@@ -808,8 +813,8 @@ public class Board : MonoBehaviour
         ClearPressedHexagonsValidWord();
         ChangeTurn();
         ResetWordState();
-        CheckBoardIsPlayable();
         CheckHomesAreSet();
+        CheckBoardIsPlayable();
         CheckBonusTurn();
         AudioWordSubmit.Play();
         ProcessGlowingHexagons();
