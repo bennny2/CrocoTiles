@@ -271,6 +271,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _hexagonCurrentState: 
   _hexagonScoreText: {fileID: 4075949118026159193}
+  _hexagonScore: 0
 --- !u!1 &7219835349260339435
 GameObject:
   m_ObjectHideFlags: 0
@@ -288,7 +289,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1606374959284013004
 RectTransform:
   m_ObjectHideFlags: 0

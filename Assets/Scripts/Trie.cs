@@ -121,7 +121,7 @@ class Trie
 
     private void GenerateWordsHelper(List<string> letters, bool[] used, TrieNode node, List<char> word, HashSet<string> usedWords, List<string> validWords, int wordLength)
     {
-        if (validWords.Count >= 15)
+        if (validWords.Count >= 20)
             return;
 
         if (word.Count == wordLength)
@@ -131,7 +131,6 @@ class Trie
                 string newWord = new string(word.ToArray());
                 if (!usedWords.Contains(newWord))
                 {
-                    //UnityEngine.Debug.Log(newWord);
                     validWords.Add(newWord);
                     usedWords.Add(newWord);
                 }

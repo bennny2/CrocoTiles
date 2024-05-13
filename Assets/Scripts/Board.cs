@@ -252,14 +252,6 @@ public class Board : MonoBehaviour
                 chosenWord = FindIndexOfMax(scores);
                 break;
         }
-/*
-        string x = "";
-        foreach (Hexagon hex in hexagonPermutationsContainingValidWord[chosenWord])
-        {
-            x += hex.HexagonText.text;
-        }
-        Debug.Log(x);
-        */
         return hexagonPermutationsContainingValidWord[chosenWord];
     }
 
@@ -305,7 +297,7 @@ public class Board : MonoBehaviour
             throw new ArgumentException("Array is null or empty");
         }
 
-        int middleIndex = array.Length / 2;
+        int middleIndex = (int)Math.Ceiling((double)array.Length / 2);
 
         return middleIndex;
     }
@@ -432,33 +424,7 @@ public class Board : MonoBehaviour
 
         return ListOfHexesToPlay;
     }
-    
-    /*
-    private List<List<Hexagon>> FindHexagonsAttachedToLettersForCPUToPlay(List<string> validWordListForCPU, List<Hexagon> scoredHexes) {
-        List<List<Hexagon>> hexagonPermutationsContainingValidWord = new();
-        foreach (string word in validWordListForCPU) {
-            List<Hexagon> hexagonPermutation = new();
-            List<char> lettersInWord = word.ToList();
 
-            foreach (char letter in lettersInWord) {
-                Hexagon highestScoredHexagon = scoredHexes
-                .Where(x => x.HexagonText.text == letter.ToString())
-                .OrderByDescending(x => x.HexagonScore)
-                .FirstOrDefault();
-
-                if (highestScoredHexagon != null) {
-                    hexagonPermutation.Add(highestScoredHexagon);
-                    scoredHexes.Remove(highestScoredHexagon);
-                }
-
-            }
-
-            hexagonPermutationsContainingValidWord.Add(hexagonPermutation);
-        }
-
-        return hexagonPermutationsContainingValidWord;
-    }
-    */
     private List<List<Hexagon>> FindHexagonsAttachedToLettersForCPUToPlay(List<string> validWordListForCPU, List<Hexagon> scoredHexes) {
         List<List<Hexagon>> hexagonPermutationsContainingValidWord = new();
 
@@ -484,7 +450,6 @@ public class Board : MonoBehaviour
 
         return hexagonPermutationsContainingValidWord;
     }
-
 
     private void GenerateHexagonScores(List<Hexagon> neutralHexes) {
         foreach (Hexagon hex in AllHexagons) {
