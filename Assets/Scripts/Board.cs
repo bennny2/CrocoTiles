@@ -67,6 +67,8 @@ public class Board : MonoBehaviour
     private GameObject _bonusReminder;
     [SerializeField]
     private GameObject _autoShufflePopup;
+    [SerializeField]
+    private GameObject _boardInteractionBlocker;
 
     // Fields
 
@@ -76,6 +78,8 @@ public class Board : MonoBehaviour
     private Trie _trie = new();
     private bool _team1Turn = true;
     private int _shuffleCounter = 0;
+    private bool _shouldCPUWaitForShuffle = false;
+    private bool _gameFinished = false;
 
     // Hexagon State Properties
 
@@ -115,6 +119,10 @@ public class Board : MonoBehaviour
     public GameObject Team2Icon { get => _team2Icon; set => _team2Icon = value; }
     public GameObject BonusReminder { get => _bonusReminder; set => _bonusReminder = value; }
     public GameObject AutoShufflePopup { get => _autoShufflePopup; set => _autoShufflePopup = value; }
+    public GameObject BoardInteractionBlocker { get => _boardInteractionBlocker; set => _boardInteractionBlocker = value; }
+    public bool ShouldCPUWaitForShuffle { get => _shouldCPUWaitForShuffle; set => _shouldCPUWaitForShuffle = value; }
+    public bool GameFinished { get => _gameFinished; set => _gameFinished = value; }
+
 
     // Class Methods
 
@@ -135,9 +143,23 @@ public class Board : MonoBehaviour
     }
 
     void Update() {
-        if (Input.GetMouseButtonDown(1)) {
+        if (Input.GetMouseButtonDown(1) && (PlayerPrefs.GetString("GameType", "Local") == "Local" || Team1Turn)) {
             ClearWord();
         }
+        ProcessGlowingHexagons();
+    }
+
+    private void ActivateCPUsTurn() {
+        BonusReminder.SetActive(false);
+        BoardInteractionBlocker.SetActive(true);
+        if (!ShouldCPUWaitForShuffle) {
+           StartCoroutine(WaitBeforeFindingWord());  
+        }
+    }
+
+    IEnumerator WaitBeforeFindingWord() {
+        yield return new WaitForSeconds(1);
+        PlayCPUsWordOnBoard(GenerateCPUsWord());
     }
 
     private void ChangeTurn() { 
@@ -152,13 +174,15 @@ public class Board : MonoBehaviour
         if (ShuffleCounter < 10) {
             ShuffleCounter += 1;
         } else {
+            ShouldCPUWaitForShuffle = true;
             StartCoroutine(ShufflePopup2Seconds());
             ShuffleCounter = 0;
         }
     }
 
     private void CheckBoardIsPlayable() {
-        if (!Trie.CanFormValidWord(AllHexagons)) {
+        if (!Trie.CanFormValidWord(AllHexagons) && GameFinished == false) {
+            ShouldCPUWaitForShuffle = true;
             StartCoroutine(ShufflePopup2Seconds());
         }
     }
@@ -188,6 +212,51 @@ public class Board : MonoBehaviour
         if (noHomeTeam2 == true) {
             SetNewHome("homeTeam2");
         }
+    }
+
+    private void CheckIfIsCPUTurn() {
+        switch (PlayerPrefs.GetString("GameType", "Local")) {   
+            case "Local":
+                return;
+            case "CPU":
+                if (!Team1Turn && GameFinished == false) {
+                    ActivateCPUsTurn();
+                } else {
+                    DeactivateCPUsTurn();
+                }
+                break;
+        }
+    }
+
+    private List<Hexagon> ChooseCPUsWordBasedOnScore(List<List<Hexagon>> hexagonPermutationsContainingValidWord) {
+        int[] scores = new int[hexagonPermutationsContainingValidWord.Count];
+        int counter = 0;
+        foreach (List<Hexagon> permutation in hexagonPermutationsContainingValidWord) {
+            int wordScore = 0;
+            foreach (Hexagon hex in permutation) {
+                wordScore += hex.HexagonScore;
+            }
+            scores[counter] = wordScore;
+            counter += 1;
+        }  
+
+        int chosenWord = FindIndexOfMax(scores);
+                
+        return hexagonPermutationsContainingValidWord[chosenWord];
+    }
+
+    public int FindIndexOfMax(int[] array) {
+        int maxIndex = 0; 
+        int maxValue = array[0]; 
+
+        for (int i = 1; i < array.Length; i++) {
+            if (array[i] > maxValue) {
+                maxValue = array[i];
+                maxIndex = i;
+            }
+        }
+
+        return maxIndex;
     }
 
     private void ClearHexagon(Hexagon hex) {
@@ -256,15 +325,143 @@ public class Board : MonoBehaviour
         CurrentWordObjectOnScreen.UpdateCurrentWord(word);
     }
 
+    private void DeactivateCPUsTurn() {
+        BoardInteractionBlocker.SetActive(false);
+    }
+
+    private List<Hexagon> UpdateHexagonsScores() {
+        List<Hexagon> neutralHexes = new(AllHexagons.Where(hex => hex.HexagonCurrentState == "neutral"));
+        GenerateHexagonScores(neutralHexes);
+        return neutralHexes;
+    }
+
+    private List<Hexagon> GenerateCPUsWord() {
+        List<Hexagon> scoredHexes = new(UpdateHexagonsScores());
+
+        int cPUTargetWordLength = 0;
+        int difficultyValue = 0;
+
+        switch (PlayerPrefs.GetString("Difficulty", "Medium")) 
+        {
+            case "Easy":
+                cPUTargetWordLength = UnityEngine.Random.Range(3, 6);
+                difficultyValue = 0;
+                break;
+            case "Medium":
+                cPUTargetWordLength = UnityEngine.Random.Range(4, 10);
+                difficultyValue = 1;
+                break;
+            case "Hard":
+                cPUTargetWordLength = UnityEngine.Random.Range(4, scoredHexes.Count);
+                difficultyValue = 2;
+                break;
+            case "Impossible":
+                cPUTargetWordLength = scoredHexes.Count;
+                difficultyValue = 3;
+                break;
+        }
+
+        List<string> validWordListForCPU = new();
+        if (difficultyValue == 3) {
+            while (validWordListForCPU.Count == 0)
+            {
+                validWordListForCPU = new(Trie.GenerateWordsFromGameObjects(scoredHexes, cPUTargetWordLength));
+                cPUTargetWordLength -= 1;
+            }
+        } else {
+            while (validWordListForCPU.Count == 0)
+            {
+                if (cPUTargetWordLength >= scoredHexes.Count) {
+                    cPUTargetWordLength = 3;
+                }
+                validWordListForCPU = new(Trie.GenerateWordsFromGameObjects(scoredHexes, cPUTargetWordLength));
+                cPUTargetWordLength += 1;
+            }
+        }
+       
+        List<List<Hexagon>> hexagonPermutationsContainingValidWord = new(FindHexagonsAttachedToLettersForCPUToPlay(validWordListForCPU, scoredHexes));
+
+        List<Hexagon> ListOfHexesToPlay = ChooseCPUsWordBasedOnScore(hexagonPermutationsContainingValidWord);
+
+        return ListOfHexesToPlay;
+    }
+
+    private List<List<Hexagon>> FindHexagonsAttachedToLettersForCPUToPlay(List<string> validWordListForCPU, List<Hexagon> scoredHexes) {
+        List<List<Hexagon>> hexagonPermutationsContainingValidWord = new();
+
+        foreach (string word in validWordListForCPU) {
+            List<Hexagon> hexagonsCopy = new List<Hexagon>(scoredHexes);
+            List<Hexagon> hexagonPermutation = new List<Hexagon>();
+            List<char> lettersInWord = word.ToList();
+
+            foreach (char letter in lettersInWord) {
+                Hexagon highestScoredHexagon = hexagonsCopy
+                    .Where(x => x.HexagonText.text == letter.ToString())
+                    .OrderByDescending(x => x.HexagonScore)
+                    .FirstOrDefault();
+
+                if (highestScoredHexagon != null) {
+                    hexagonPermutation.Add(highestScoredHexagon);
+                    hexagonsCopy.Remove(highestScoredHexagon);
+                }
+            }
+
+            hexagonPermutationsContainingValidWord.Add(hexagonPermutation);
+        }
+
+        return hexagonPermutationsContainingValidWord;
+    }
+
+    private void GenerateHexagonScores(List<Hexagon> neutralHexes) {
+        foreach (Hexagon hex in AllHexagons) {
+            hex.HexagonScoreText.text = ""; 
+        }
+        foreach (Hexagon hex in neutralHexes) {
+            hex.HexagonScore = 0;
+            if (hex.FindIfThereIsATouchingHexagonOfType(GetMyHomeState()) && hex.FindIfThereIsATouchingHexagonOfType(GetOpponentTerritoryState()) || 
+                hex.FindIfThereIsATouchingHexagonOfType(GetMyTerritoryState()) && hex.FindIfThereIsATouchingHexagonOfType(GetOpponentHomeState())) {
+                hex.HexagonScore += 30;
+            }
+            if (hex.FindIfThereIsATouchingHexagonOfType(GetMyHomeState())) {
+                hex.HexagonScore += 12;
+            }
+            if (hex.FindIfThereIsATouchingHexagonOfType(GetMyTerritoryState()) && hex.FindIfThereIsATouchingHexagonOfType(GetOpponentTerritoryState())) {
+                hex.HexagonScore += 9;
+            }
+            if (hex.FindIfThereIsATouchingHexagonOfType(GetMyTerritoryState())) {
+                hex.HexagonScore += 3;
+            }
+            if (hex.FindIfThereIsATouchingHexagonOfType(GetOpponentHomeState())) {
+                hex.HexagonScore += 3;
+            }
+            if (hex.FindIfThereIsATouchingHexagonOfType(GetOpponentTerritoryState())) {
+                hex.HexagonScore += 1;
+            }
+        }
+    }
+
     private HexagonStates GetCurrentTeam() {
         return Team1Turn ? PressedTeam1 : PressedTeam2;
     }
 
-    private string GetOpponentHomeState(string hexState) {
+    private string GetOpponentHomeState() {
         return Team1Turn ? "homeTeam2" : "homeTeam1";
     }
 
+    private string GetOpponentTerritoryState() {
+        return Team1Turn ? "territoryTeam2" : "territoryTeam1";
+    }
+
+    private string GetMyHomeState() {
+        return Team1Turn ? "homeTeam1" : "homeTeam2";
+    }
+
+    private string GetMyTerritoryState() {
+        return Team1Turn ? "territoryTeam1" : "territoryTeam2";
+    }
+
     private void HasWon() {
+        GameFinished = true;
         BonusReminder.SetActive(false);
         if (!Team1Turn) {
             WinnerBlockText.text = "Team 1 has Won!";
@@ -455,13 +652,14 @@ public class Board : MonoBehaviour
                     BonusReminder.SetActive(true);
                     BonusTurnActive = true;
                     touchingHexagon.SetLetter();
-                    SetNewHome(GetOpponentHomeState(hexState));
+                    SetNewHome(GetOpponentHomeState());
                 }
             }
         }
     }
 
-    private void PlayAgain() {
+    private void PlayAgain() { //referenced by button in game
+        GameFinished = false;
         WinnerBlock.SetActive(false);
         PlayAgainButton.gameObject.SetActive(false);
         QuitButton.gameObject.SetActive(false);
@@ -473,6 +671,19 @@ public class Board : MonoBehaviour
         ProcessGlowingHexagons();
         SetCameraZoomAndPosition();
         Team1Turn = true;
+    }
+
+    private void PlayCPUsWordOnBoard(List<Hexagon> hexes) {
+        StartCoroutine(PressHexagonsForCPU(hexes));
+    }
+
+    IEnumerator PressHexagonsForCPU(List<Hexagon> hexes) {
+        foreach (Hexagon hex in hexes) {
+            yield return new WaitForSeconds(1);
+            HexagonPressed(hex);
+        }
+        yield return new WaitForSeconds(1);
+        SubmitButtonPressed();
     }
 
     private void ProcessGlowingHexagons() {
@@ -528,12 +739,15 @@ public class Board : MonoBehaviour
         ClearPressedHexagonsValidWord();
         ChangeTurn();
         ResetWordState();
-        CheckBoardIsPlayable();
         CheckHomesAreSet();
+        CheckBoardIsPlayable();
         CheckBonusTurn();
         AudioWordSubmit.Play();
         ProcessGlowingHexagons();
         CheckIfAllLettersOnBoardShouldBeShuffled();
+        List<Hexagon> neutralHexes = new(AllHexagons.Where(x => x.HexagonCurrentState == "neutral").ToList());
+        GenerateHexagonScores(neutralHexes);
+        CheckIfIsCPUTurn();
     }
 
     private void ProcessInvalidWord() {
@@ -625,6 +839,8 @@ public class Board : MonoBehaviour
         yield return new WaitForSeconds(2);
         ShuffleLetters();
         AutoShufflePopup.SetActive(false);
+        ShouldCPUWaitForShuffle = false;
+        CheckIfIsCPUTurn();
     }
     private bool ShouldMakeNeutralForTeam1(string hexState) {
         return hexState != "homeTeam1" && hexState != "territoryTeam1" && hexState != "pressedTeam1";

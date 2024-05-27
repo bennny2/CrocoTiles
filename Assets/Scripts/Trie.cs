@@ -94,8 +94,73 @@ class Trie
         }
         return node;
     }
+    public List<string> GenerateWordsFromGameObjects(List<Hexagon> scoredHexes, int wordLength)
+    {
+        List<string> letters = new();
+        foreach (Hexagon hex in scoredHexes)
+        {
+            if (!string.IsNullOrWhiteSpace(hex.HexagonText.text))
+            {
+                letters.Add(hex.HexagonText.text); 
+            }
+        }
+        return GenerateWordsFromLetters(letters, wordLength);
+    }
+
+    private List<string> GenerateWordsFromLetters(List<string> letters, int wordLength)
+    {
+        List<string> validWords = new();
+        List<char> word = new();
+        bool[] used = new bool[letters.Count];
+        HashSet<string> usedWords = new();
+
+        GenerateWordsHelper(letters, used, _root, word, usedWords, validWords, wordLength);
+        
+        return validWords;
+    }
+
+    private void GenerateWordsHelper(List<string> letters, bool[] used, TrieNode node, List<char> word, HashSet<string> usedWords, List<string> validWords, int wordLength)
+    {
+        if (validWords.Count >= 20)
+            return;
+
+        if (word.Count == wordLength)
+        {
+            if (node.IsEndOfWord)
+            {
+                string newWord = new string(word.ToArray());
+                if (!usedWords.Contains(newWord))
+                {
+                    validWords.Add(newWord);
+                    usedWords.Add(newWord);
+                }
+            }
+            return;
+        }
+
+        for (int i = 0; i < letters.Count; i++)
+        {
+            if (!used[i])
+            {
+                char letter = letters[i][0];
+                int index = letter - 'a';
+
+                if (node.Children[index] != null)
+                {
+                    used[i] = true;
+                    word.Add(letter);
+                    GenerateWordsHelper(letters, used, node.Children[index], word, usedWords, validWords, wordLength);
+                    word.RemoveAt(word.Count - 1);
+                    used[i] = false;
+
+                    if (validWords.Count >= 15)
+                        return;
+                }
+            }
+        }
+    }
     
-    private IEnumerable<IEnumerable<T>> GetPermutationsWithDuplicates<T>(IEnumerable<T> list, int length) {
+    public IEnumerable<IEnumerable<T>> GetPermutationsWithDuplicates<T>(IEnumerable<T> list, int length) {
 
         Dictionary<T, int> elementCounts = list.GroupBy(e => e).ToDictionary(g => g.Key, g => g.Count());
 
