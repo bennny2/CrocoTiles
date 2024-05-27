@@ -16,6 +16,8 @@ public class MainMenuBoard : MonoBehaviour {
     private GameObject _cPUHardButton;
     [SerializeField]
     private GameObject _cPUMediumButton;
+    [SerializeField]
+    private GameObject _cPUImpossibleButton;
     
     // Properties
 
@@ -24,6 +26,7 @@ public class MainMenuBoard : MonoBehaviour {
     public GameObject CPUEasyButton { get => _cPUEasyButton; set => _cPUEasyButton = value; }
     public GameObject CPUHardButton { get => _cPUHardButton; set => _cPUHardButton = value; }
     public GameObject CPUMediumButton { get => _cPUMediumButton; set => _cPUMediumButton = value; }
+    public GameObject CPUImpossibleButton { get => _cPUImpossibleButton; set => _cPUImpossibleButton = value; }
 
     // Class Methods
 
@@ -78,6 +81,11 @@ public class MainMenuBoard : MonoBehaviour {
         SetNewPointerLocation("medium");
         ButtonSound.Play();
     }
+    public void SetCPUToImpossible() {
+        PlayerPrefs.SetString("Difficulty", "Impossible");
+        SetNewPointerLocation("impossible");
+        ButtonSound.Play();
+    }
 
     private void SetInitialPointerLocation() {
         switch (PlayerPrefs.GetString("Difficulty", "Medium")) 
@@ -90,6 +98,9 @@ public class MainMenuBoard : MonoBehaviour {
                 break;
             case "Hard":
                 Pointer.transform.position = CPUHardButton.transform.position;
+                break;
+            case "Impossible":
+                Pointer.transform.position = CPUImpossibleButton.transform.position;
                 break;
         }
         Pointer.transform.Translate(new Vector3(0, 80, 0));
@@ -106,6 +117,9 @@ public class MainMenuBoard : MonoBehaviour {
                 break;
             case "hard":
                 Pointer.transform.position = CPUHardButton.transform.position;
+                break;
+            case "impossible":
+                Pointer.transform.position = CPUImpossibleButton.transform.position;
                 break;
         }
         Pointer.transform.Translate(new Vector3(0, 80, 0));
