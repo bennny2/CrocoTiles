@@ -48,6 +48,11 @@ public class MainMenuBoard : MonoBehaviour {
         StartCoroutine(LoadSceneCoroutine("GameScene"));
     }
 
+    public void LoadGameSceneOnlineGame() {
+        ButtonSound.Play();
+        StartCoroutine(LoadSceneCoroutine("ConnectingToServerScene"));
+    }
+
     public void LoadGameSceneVsCPU() {
         PlayerPrefs.SetString("GameType", "CPU");
         ButtonSound.Play();
