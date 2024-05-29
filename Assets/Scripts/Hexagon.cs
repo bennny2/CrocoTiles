@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Photon.Pun;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Hexagon : MonoBehaviour
+[Serializable]
+public class Hexagon : MonoBehaviour, IPunObservable
 {
 
     // Serialized Fields
@@ -167,6 +169,20 @@ public class Hexagon : MonoBehaviour
 
     public void SetLetter(){
         HexagonText.text = Letter.GenerateLetter();
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            // If this is the owner, send the color of the Image component
+            stream.SendNext(HexagonImage.color);
+        }
+        else
+        {
+            // If this is not the owner, receive the color and set it
+            HexagonImage.color = (Color)stream.ReceiveNext();
+        }
     }
 }
 
