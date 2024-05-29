@@ -6,8 +6,9 @@ using System;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using Photon.Pun;
 
-public class Board : MonoBehaviour
+public class Board : MonoBehaviourPunCallbacks
 {
 
     // Hexagon States   
@@ -127,26 +128,34 @@ public class Board : MonoBehaviour
     // Class Methods
 
     void Awake() {
-        InitializeHexagonsOnBoard(); 
-        InitilizeComponents();
+        if (PhotonNetwork.IsMasterClient) {
+            InitializeHexagonsOnBoard(); 
+            InitilizeComponents(); 
+        }
     }
 
     void Start() {
-        InitializeColors();
-        Letter.InitializeLetters();
-        MakeAllHexagonsInvisible();
-        SetHomeBases();
+        Debug.Log(PhotonNetwork.IsMasterClient);
+        if (PhotonNetwork.IsMasterClient) {
+            InitializeColors();
+            Letter.InitializeLetters();
+            MakeAllHexagonsInvisible();
+            SetHomeBases();
+            LoadDictionary();
+            ProcessGlowingHexagons();
+            Loadicons(); 
+        }
         SetCameraZoomAndPosition();
-        LoadDictionary();
-        ProcessGlowingHexagons();
-        Loadicons();
     }
 
     void Update() {
         if (Input.GetMouseButtonDown(1) && (PlayerPrefs.GetString("GameType", "Local") == "Local" || Team1Turn)) {
             ClearWord();
         }
-        ProcessGlowingHexagons();
+        if (PhotonNetwork.IsMasterClient) {
+           ProcessGlowingHexagons();
+           Debug.Log("Player count in room: " + PhotonNetwork.CurrentRoom.PlayerCount);
+        }
     }
 
     private void ActivateCPUsTurn() {
@@ -304,8 +313,10 @@ public class Board : MonoBehaviour
     }
 
     public void CreateHexagon(Vector3 position) {
-        GameObject newHexagonObject = Instantiate(HexagonPrefab, BoardTransform);
-        newHexagonObject.transform.SetLocalPositionAndRotation(position, Quaternion.identity);
+        GameObject newHexagonObject = PhotonNetwork.Instantiate(HexagonPrefab.name, position, Quaternion.identity);
+        newHexagonObject.transform.SetParent(BoardTransform);
+        //GameObject newHexagonObject = Instantiate(HexagonPrefab, BoardTransform);
+        //newHexagonObject.transform.SetLocalPositionAndRotation(position, Quaternion.identity);
         Hexagon newHexagon = newHexagonObject.GetComponent<Hexagon>();
         newHexagon.HexagonX = position.x;
         newHexagon.HexagonY = position.y;
@@ -545,29 +556,33 @@ public class Board : MonoBehaviour
     private void InitializeHexagonsOnBoard() {
         float boardCols = PlayerPrefs.GetInt("BoardCols", 9);
         float boardRows = PlayerPrefs.GetInt("BoardRows", 11);
-
-        float x = 0;
-        float y = 0;
-
-        for (int i = 0; i < boardRows; i++) {
-            if (i % 2 == 0) {
+        for (int i = 0; i < boardRows; i++)
+        {
+            float x;
+            float y;
+            if (i % 2 == 0)
+            {
                 //create short row
-                for (int k = 1; k <= (int)Math.Floor((double)boardCols / 2); k++) {
+                for (int k = 1; k <= (int)Math.Floor((double)boardCols / 2); k++)
+                {
                     x = k * Hexagon.HORIZONTALOFFSET * 2;
                     y = i * Hexagon.VERTICALOFFSET / 2;
                     Vector3 position = new(x - 350, y - 200);
                     CreateHexagon(position);
                 }
-            } else {
+            }
+            else
+            {
                 //create long row
-                for (int k = 1; k <= (int)Math.Ceiling((double)boardCols / 2); k++) {
+                for (int k = 1; k <= (int)Math.Ceiling((double)boardCols / 2); k++)
+                {
                     x = k * Hexagon.HORIZONTALOFFSET * 2 - Hexagon.HORIZONTALOFFSET;
                     y = i * (Hexagon.VERTICALOFFSET / 2);
                     Vector3 position = new(x - 350, y - 200);
                     CreateHexagon(position);
                 }
             }
-        }    
+        }
     }
 
     private void InitilizeComponents() {
@@ -787,7 +802,6 @@ public class Board : MonoBehaviour
     }
 
     private void SetHomeBases() {
-
         //the math only works if there are two more rows than columns in the board eg. 7 cols and 9 rows
         int boardCols = PlayerPrefs.GetInt("BoardCols", 9);
         int base1, base2;

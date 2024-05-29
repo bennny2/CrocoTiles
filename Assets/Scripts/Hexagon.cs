@@ -32,7 +32,6 @@ public class Hexagon : MonoBehaviour
 
     // Properties
 
-    public Board BoardObject => _boardObject;
     public TextMeshProUGUI HexagonText => _hexagonText;
     public string HexagonCurrentState 
     {
@@ -71,13 +70,14 @@ public class Hexagon : MonoBehaviour
         get => _hexagonScoreText; 
         set => _hexagonScoreText = value; 
     }
+    public Board BoardObject { get => _boardObject; set => _boardObject = value; }
 
 
     // Class Methods
 
     void Awake() {
         InitilizeComponents();
-        _hexagonButton.onClick.AddListener(() => _boardObject.HexagonPressed(this));
+        _hexagonButton.onClick.AddListener(() => BoardObject.HexagonPressed(this));
     }
 
     public void DeleteLetter() {
@@ -95,7 +95,7 @@ public class Hexagon : MonoBehaviour
             float targetX = this.HexagonX + horizontalOffsets[i];
             float targetY = this.HexagonY + verticalOffsets[i];
 
-            Hexagon touchingHexagon = _boardObject.AllHexagons.FirstOrDefault(h => h.HexagonX == targetX && h.HexagonY == targetY);
+            Hexagon touchingHexagon = BoardObject.AllHexagons.FirstOrDefault(h => h.HexagonX == targetX && h.HexagonY == targetY);
 
             if (touchingHexagon != null) {
                 touchingHexagonsArray.Add(touchingHexagon);
@@ -113,7 +113,7 @@ public class Hexagon : MonoBehaviour
             float targetX = this.HexagonX + horizontalOffsets[i];
             float targetY = this.HexagonY + verticalOffsets[i];
 
-            Hexagon touchingHexagon = _boardObject.AllHexagons.FirstOrDefault(h => h.HexagonX == targetX && h.HexagonY == targetY);
+            Hexagon touchingHexagon = BoardObject.AllHexagons.FirstOrDefault(h => h.HexagonX == targetX && h.HexagonY == targetY);
 
             if (touchingHexagon != null && touchingHexagon.HexagonCurrentState == targetStateType) {
                 return true;
@@ -123,7 +123,7 @@ public class Hexagon : MonoBehaviour
     } 
 
     void InitilizeComponents() {
-        _boardObject = FindObjectOfType<Board>();
+        BoardObject = FindObjectOfType<Board>();
         _hexagonText = GetComponentInChildren<TextMeshProUGUI>();
         HexagonText.outlineWidth = 0.15F;
         HexagonText.outlineColor = Color.black;
@@ -137,7 +137,7 @@ public class Hexagon : MonoBehaviour
             string hexState = touchingHexagon.HexagonCurrentState;
 
             if (hexState == "invisible") {
-                touchingHexagon.SetHexagonState(_boardObject.Neutral);
+                touchingHexagon.SetHexagonState(BoardObject.Neutral);
             }
         }
     }
