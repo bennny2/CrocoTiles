@@ -154,7 +154,7 @@ public class Board : MonoBehaviourPunCallbacks
         }
         if (PhotonNetwork.IsMasterClient) {
            ProcessGlowingHexagons();
-           Debug.Log("Player count in room: " + PhotonNetwork.CurrentRoom.PlayerCount);
+           //Debug.Log("Player count in room: " + PhotonNetwork.CurrentRoom.PlayerCount);
         }
     }
 
