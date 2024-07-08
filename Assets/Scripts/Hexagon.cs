@@ -172,20 +172,24 @@ public class Hexagon : MonoBehaviour, IPunObservable
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-{
-    if (stream.IsWriting)
     {
-        // Writing data: send the value of HexagonCurrentState to the stream
-        Debug.Log("Writing HexagonCurrentState: " + HexagonCurrentState);
-        stream.SendNext(HexagonCurrentState);
+        if (stream.IsWriting)
+        {
+            // Writing data: send the value of HexagonCurrentState to the stream
+            Debug.Log("Writing HexagonCurrentState: " + HexagonCurrentState);
+            stream.SendNext(HexagonCurrentState);
+            float[] colorVector = new float[] {HexagonImage.color.r, HexagonImage.color.g, HexagonImage.color.b, HexagonImage.color.a};
+            stream.SendNext(colorVector);
+        }
+        else
+        {
+            // Reading data: receive the value of HexagonCurrentState from the stream
+            HexagonCurrentState = (string)stream.ReceiveNext();
+            float[] colorVector = (float[])stream.ReceiveNext();
+            HexagonImage.color = new Color(colorVector[0], colorVector[1], colorVector[2], colorVector[3]);
+            Debug.Log("Received HexagonCurrentState: " + HexagonCurrentState);
+        }
     }
-    else
-    {
-        // Reading data: receive the value of HexagonCurrentState from the stream
-        HexagonCurrentState = (string)stream.ReceiveNext();
-        Debug.Log("Received HexagonCurrentState: " + HexagonCurrentState);
-    }
-}
 
 }
 
