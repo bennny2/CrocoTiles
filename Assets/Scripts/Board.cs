@@ -487,21 +487,33 @@ public class Board : MonoBehaviourPunCallbacks
     }
 
     public void HexagonPressed(Hexagon hex) {
-        string hexState = hex.HexagonCurrentState;
-        if (hexState == "neutral") {
-            AudioPressed.Play();
-            CurrentWordAddNewLetter(hex.HexagonText.text);
-            hex.SetHexagonState(GetCurrentTeam());
-
-        } else if (hexState == "pressedTeam1" || hexState == "pressedTeam2") {
-            AudioUnPressed.Play();
-            CurrentWordRemoveMostRecentLetter(hex.HexagonText.text);
-            hex.SetHexagonState(Neutral);
-
+        if (PhotonNetwork.IsMasterClient) {
+            string hexState = hex.HexagonCurrentState;
+            if (hexState == "neutral") {
+                AudioPressed.Play();
+                CurrentWordAddNewLetter(hex.HexagonText.text);
+                hex.SetHexagonState(GetCurrentTeam());
+            } else if (hexState == "pressedTeam1" || hexState == "pressedTeam2") {
+                AudioUnPressed.Play();
+                CurrentWordRemoveMostRecentLetter(hex.HexagonText.text);
+                hex.SetHexagonState(Neutral);
+            } 
+            ProcessGlowingHexagons();
         } else {
-            //if state is home/territory/invisible then do nothing
+            photonView.RPC("RequestHexagonPressOnMaster", RpcTarget.MasterClient, hex.HexagonX, hex.HexagonY);
         }
-        ProcessGlowingHexagons();
+    }
+
+    [PunRPC]
+    public void RequestHexagonPressOnMaster(float hexagonX, float hexagonY)
+    {
+        // Find the hexagon by its position
+        Hexagon hex = _allHexagons.FirstOrDefault(h => h.HexagonX == hexagonX && h.HexagonY == hexagonY);
+        if (hex != null)
+        {
+            // Call the HexagonPressed method on the master client
+            HexagonPressed(hex);
+        }
     }
 
     private bool IsHexagonPressed(Hexagon hex) {
