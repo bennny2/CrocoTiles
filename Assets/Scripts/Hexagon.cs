@@ -176,7 +176,6 @@ public class Hexagon : MonoBehaviour, IPunObservable
         if (stream.IsWriting)
         {
             // Writing data: send the data of hexagon to the stream
-            Debug.Log("Writing HexagonCurrentState: " + HexagonCurrentState);
             stream.SendNext(HexagonCurrentState);
 
             float[] colorVector = new float[] {HexagonImage.color.r, HexagonImage.color.g, HexagonImage.color.b, HexagonImage.color.a};
@@ -192,7 +191,6 @@ public class Hexagon : MonoBehaviour, IPunObservable
 
             float[] colorVector = (float[])stream.ReceiveNext();
             HexagonImage.color = new Color(colorVector[0], colorVector[1], colorVector[2], colorVector[3]);
-            Debug.Log("Received HexagonCurrentState: " + HexagonCurrentState);
 
             HexagonText.text = (string)stream.ReceiveNext();
         }

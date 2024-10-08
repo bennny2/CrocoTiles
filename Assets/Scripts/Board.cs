@@ -8,7 +8,7 @@ using TMPro;
 using System.Collections;
 using Photon.Pun;
 
-public class Board : MonoBehaviourPunCallbacks
+public class Board : MonoBehaviourPunCallbacks, IPunObservable
 {
 
     // Hexagon States   
@@ -70,6 +70,9 @@ public class Board : MonoBehaviourPunCallbacks
     private GameObject _autoShufflePopup;
     [SerializeField]
     private GameObject _boardInteractionBlocker;
+    [SerializeField]
+    private PhotonView _photonView;
+    
 
     // Fields
 
@@ -123,6 +126,7 @@ public class Board : MonoBehaviourPunCallbacks
     public GameObject BoardInteractionBlocker { get => _boardInteractionBlocker; set => _boardInteractionBlocker = value; }
     public bool ShouldCPUWaitForShuffle { get => _shouldCPUWaitForShuffle; set => _shouldCPUWaitForShuffle = value; }
     public bool GameFinished { get => _gameFinished; set => _gameFinished = value; }
+    public PhotonView PhotonView { get => _photonView; set => _photonView = value; }
 
 
     // Class Methods
@@ -500,19 +504,22 @@ public class Board : MonoBehaviourPunCallbacks
             } 
             ProcessGlowingHexagons();
         } else {
-            photonView.RPC("RequestHexagonPressOnMaster", RpcTarget.MasterClient, hex.HexagonX, hex.HexagonY);
+            Debug.Log("NON MASTER CLIENT PRESSED HEXAGON");
+            PhotonView.RPC("RequestHexagonPressOnMaster", RpcTarget.MasterClient, hex.HexagonX, hex.HexagonY);
         }
     }
 
     [PunRPC]
     public void RequestHexagonPressOnMaster(float hexagonX, float hexagonY)
     {
+        Debug.Log("request heaxgon press on master called");
         // Find the hexagon by its position
         Hexagon hex = _allHexagons.FirstOrDefault(h => h.HexagonX == hexagonX && h.HexagonY == hexagonY);
         if (hex != null)
         {
             // Call the HexagonPressed method on the master client
             HexagonPressed(hex);
+            Debug.Log("hexagon perssed called final");
         }
     }
 
@@ -913,5 +920,9 @@ public class Board : MonoBehaviourPunCallbacks
         GameObject teamIcon = team == "homeTeam2" ? Team2Icon : Team1Icon;
         teamIcon.SetActive(true);
         teamIcon.transform.position = new Vector2(hex.HexagonX / 108f, hex.HexagonY / 108f);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
     }
 }
