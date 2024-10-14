@@ -183,6 +183,10 @@ public class Hexagon : MonoBehaviour, IPunObservable
 
             string hexagonString = HexagonText.text;
             stream.SendNext(hexagonString);
+
+            stream.SendNext(HexagonX);
+
+            stream.SendNext(HexagonY);
         }
         else
         {
@@ -193,6 +197,10 @@ public class Hexagon : MonoBehaviour, IPunObservable
             HexagonImage.color = new Color(colorVector[0], colorVector[1], colorVector[2], colorVector[3]);
 
             HexagonText.text = (string)stream.ReceiveNext();
+
+            HexagonX = (float)stream.ReceiveNext();
+
+            HexagonY = (float)stream.ReceiveNext();
         }
     }
 

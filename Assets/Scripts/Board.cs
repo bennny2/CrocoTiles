@@ -504,7 +504,13 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
             } 
             ProcessGlowingHexagons();
         } else {
-            Debug.Log("NON MASTER CLIENT PRESSED HEXAGON");
+            Debug.Log("--------------------------");
+            Debug.Log("INFO FOR HEXAGON CLICKED BY SECOND CLIENT");
+            Debug.Log(hex.HexagonCurrentState);
+            Debug.Log(hex.HexagonText.text);
+            Debug.Log(hex.HexagonX);
+            Debug.Log(hex.HexagonY);
+            Debug.Log("--------------------------");
             PhotonView.RPC("RequestHexagonPressOnMaster", RpcTarget.MasterClient, hex.HexagonX, hex.HexagonY);
         }
     }
@@ -512,14 +518,18 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     public void RequestHexagonPressOnMaster(float hexagonX, float hexagonY)
     {
-        Debug.Log("request heaxgon press on master called");
-        // Find the hexagon by its position
+        
         Hexagon hex = _allHexagons.FirstOrDefault(h => h.HexagonX == hexagonX && h.HexagonY == hexagonY);
         if (hex != null)
         {
-            // Call the HexagonPressed method on the master client
+            Debug.Log("--------------------------");
+            Debug.Log("INFO FOR HEXAGON FOUND THROUGH COORDS");
+            Debug.Log(hex.HexagonCurrentState);
+            Debug.Log(hex.HexagonText.text);
+            Debug.Log(hex.HexagonX);
+            Debug.Log(hex.HexagonY);
+            Debug.Log("--------------------------");
             HexagonPressed(hex);
-            Debug.Log("hexagon perssed called final");
         }
     }
 
