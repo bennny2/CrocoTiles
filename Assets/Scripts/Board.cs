@@ -152,7 +152,7 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
             ProcessGlowingHexagons();
             Loadicons(); 
         } else {
-            MoveHexagonsIntoCanvasForSecondClient();
+            StartCoroutine(DelayedMoveHexagonsIntoCanvas());
         }
         SetCameraZoomAndPosition();
     }
@@ -191,12 +191,20 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
-    private void MoveHexagonsIntoCanvasForSecondClient() {
-        List<GameObject> secondClientsAllHexagons = FindObjectsOfType<GameObject>().Where(h => h.name.Contains("(clone)")).ToList();
+    private IEnumerator DelayedMoveHexagonsIntoCanvas()
+    {
+        yield return new WaitForSeconds(0.15f);
+        MoveHexagonsIntoCanvasForSecondClient();
+    }
+
+    private void MoveHexagonsIntoCanvasForSecondClient()
+    {
+        List<GameObject> secondClientsAllHexagons = FindObjectsOfType<GameObject>()
+            .Where(h => h.name.Contains("(Clone)")).ToList();
         foreach (GameObject hex in secondClientsAllHexagons)
         {
-            Debug.Log("test");
-            hex.transform.SetParent(BoardTransform, false);
+            Debug.Log("Moving hexagon to board");
+            hex.transform.SetParent(BoardTransform, true);
         }
     }
 

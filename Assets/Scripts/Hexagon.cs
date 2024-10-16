@@ -203,6 +203,5 @@ public class Hexagon : MonoBehaviour, IPunObservable
             HexagonY = (float)stream.ReceiveNext();
         }
     }
-
 }
 
