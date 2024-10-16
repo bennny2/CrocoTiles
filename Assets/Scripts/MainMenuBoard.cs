@@ -49,6 +49,7 @@ public class MainMenuBoard : MonoBehaviour {
     }
 
     public void LoadGameSceneOnlineGame() {
+        PlayerPrefs.SetString("GameType", "Online");
         ButtonSound.Play();
         StartCoroutine(LoadSceneCoroutine("ConnectingToServerScene"));
     }

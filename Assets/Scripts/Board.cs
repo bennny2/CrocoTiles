@@ -84,6 +84,7 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     private int _shuffleCounter = 0;
     private bool _shouldCPUWaitForShuffle = false;
     private bool _gameFinished = false;
+    private string _gameType = "Local";
 
     // Hexagon State Properties
 
@@ -127,6 +128,7 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     public bool ShouldCPUWaitForShuffle { get => _shouldCPUWaitForShuffle; set => _shouldCPUWaitForShuffle = value; }
     public bool GameFinished { get => _gameFinished; set => _gameFinished = value; }
     public PhotonView PhotonView { get => _photonView; set => _photonView = value; }
+    public string GameType { get => _gameType; set => _gameType = value; }
 
 
     // Class Methods
@@ -139,6 +141,7 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     void Start() {
+        SetGameType();
         Debug.Log(PhotonNetwork.IsMasterClient);
         if (PhotonNetwork.IsMasterClient) {
             InitializeColors();
@@ -152,13 +155,16 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
         SetCameraZoomAndPosition();
     }
 
+    private void SetGameType() {
+        GameType = PlayerPrefs.GetString("GameType", "Local");
+    }
+
     void Update() {
-        if (Input.GetMouseButtonDown(1) && (PlayerPrefs.GetString("GameType", "Local") == "Local" || Team1Turn)) {
+        if (Input.GetMouseButtonDown(1) && GameType == "Local" || Team1Turn) {
             ClearWord();
         }
         if (PhotonNetwork.IsMasterClient) {
            ProcessGlowingHexagons();
-           //Debug.Log("Player count in room: " + PhotonNetwork.CurrentRoom.PlayerCount);
         }
     }
 
@@ -504,13 +510,6 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
             } 
             ProcessGlowingHexagons();
         } else {
-            Debug.Log("--------------------------");
-            Debug.Log("INFO FOR HEXAGON CLICKED BY SECOND CLIENT");
-            Debug.Log(hex.HexagonCurrentState);
-            Debug.Log(hex.HexagonText.text);
-            Debug.Log(hex.HexagonX);
-            Debug.Log(hex.HexagonY);
-            Debug.Log("--------------------------");
             PhotonView.RPC("RequestHexagonPressOnMaster", RpcTarget.MasterClient, hex.HexagonX, hex.HexagonY);
         }
     }
@@ -522,13 +521,6 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
         Hexagon hex = _allHexagons.FirstOrDefault(h => h.HexagonX == hexagonX && h.HexagonY == hexagonY);
         if (hex != null)
         {
-            Debug.Log("--------------------------");
-            Debug.Log("INFO FOR HEXAGON FOUND THROUGH COORDS");
-            Debug.Log(hex.HexagonCurrentState);
-            Debug.Log(hex.HexagonText.text);
-            Debug.Log(hex.HexagonX);
-            Debug.Log(hex.HexagonY);
-            Debug.Log("--------------------------");
             HexagonPressed(hex);
         }
     }
