@@ -735,6 +735,8 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     private void ProcessGlowingHexagons() {
+        if(PhotonNetwork.IsMasterClient)
+        {
         foreach (Hexagon hex in AllHexagons)
         {
             bool isTeam1Hex = hex.HexagonCurrentState == "territoryTeam1" || hex.HexagonCurrentState == "homeTeam1";
@@ -749,6 +751,7 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
             hex.HexagonImage.material.color = hex.HexagonImage.color;
             hex.HexagonImage.material.SetFloat("_GlowStrength", shouldGlow ? 1.0f : 0.0f); 
             hex.HexagonImage.material.SetFloat("_PulseSpeed", shouldGlow ? 3.0f : 0.0f); 
+        }
         }
     }
 
@@ -828,6 +831,10 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
                 camSize = 3.2f;
                 camMove = new(0.65f, 0.35f);
                 break;
+        }
+
+        if (GameType == "Online") {
+            camSize *= 100;
         }
 
         Camera.main.orthographicSize = camSize;
@@ -919,15 +926,23 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     public void SubmitButtonPressed() {
+        if (PhotonNetwork.IsMasterClient) {
+            if (Trie.Search(CurrentWordObjectOnScreen.CurrentWordText.text.ToLower()))
+            {
+                ProcessValidWord();
+            }
+            else
+            {
+                ProcessInvalidWord();
+            }
+        } else {
+            PhotonView.RPC("RequestSubmitButtonPressedOnMaster", RpcTarget.MasterClient);
+        }
+    }
 
-        if (Trie.Search(CurrentWordObjectOnScreen.CurrentWordText.text.ToLower()))
-        {
-            ProcessValidWord();
-        }
-        else
-        {
-            ProcessInvalidWord();
-        }
+    [PunRPC]
+    public void RequestSubmitButtonPressedOnMaster() {
+        SubmitButtonPressed();
     }
 
     private void UpdateTeamIconPosition(Hexagon hex, string team) {
