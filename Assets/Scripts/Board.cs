@@ -134,14 +134,14 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     // Class Methods
 
     void Awake() {
-        if (PhotonNetwork.IsMasterClient) {
+        SetGameType();
+        if (PhotonNetwork.IsMasterClient || GameType != "Online") {
             InitializeHexagonsOnBoard(); 
             InitilizeComponents(); 
         }
     }
 
     void Start() {
-        SetGameType();
         Debug.Log(PhotonNetwork.IsMasterClient);
         if (PhotonNetwork.IsMasterClient) {
             InitializeColors();
@@ -160,7 +160,7 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     void Update() {
-        if (Input.GetMouseButtonDown(1) && GameType == "Local" || Team1Turn) {
+        if (Input.GetMouseButtonDown(1)) {
             ClearWord();
         }
         if (PhotonNetwork.IsMasterClient) {
@@ -314,7 +314,7 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     public void ClearWord() {
-        if (!string.IsNullOrWhiteSpace(CurrentWordObjectOnScreen.CurrentWordText.text)) {
+        if (!string.IsNullOrWhiteSpace(CurrentWordObjectOnScreen.CurrentWordText.text) && (GameType == "Local" || ((Team1Turn && PhotonNetwork.IsMasterClient) || (!Team1Turn && !PhotonNetwork.IsMasterClient)))) {
             ResetWordState();
             AudioClearWord.Play();
             ClearPressedHexagonsInvalidWord();
@@ -323,13 +323,25 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     public void CreateHexagon(Vector3 position) {
-        GameObject newHexagonObject = PhotonNetwork.Instantiate(HexagonPrefab.name, position, Quaternion.identity);
-        newHexagonObject.transform.SetParent(BoardTransform);
+        if (GameType == "Local" || GameType == "CPU") {
+            GameObject newHexagonObject = Instantiate(HexagonPrefab, BoardTransform);
+            newHexagonObject.transform.SetLocalPositionAndRotation(position, Quaternion.identity);
+            Hexagon newHexagon = newHexagonObject.GetComponent<Hexagon>();
+            newHexagon.HexagonX = position.x;
+            newHexagon.HexagonY = position.y; 
+        } else {
+            GameObject newHexagonObject = PhotonNetwork.Instantiate(HexagonPrefab.name, position, Quaternion.identity);
+            newHexagonObject.transform.SetParent(BoardTransform);
+            Hexagon newHexagon = newHexagonObject.GetComponent<Hexagon>();
+            newHexagon.HexagonX = position.x;
+            newHexagon.HexagonY = position.y;
+        }
+        
         //GameObject newHexagonObject = Instantiate(HexagonPrefab, BoardTransform);
         //newHexagonObject.transform.SetLocalPositionAndRotation(position, Quaternion.identity);
-        Hexagon newHexagon = newHexagonObject.GetComponent<Hexagon>();
-        newHexagon.HexagonX = position.x;
-        newHexagon.HexagonY = position.y;
+        //Hexagon newHexagon = newHexagonObject.GetComponent<Hexagon>();
+        //newHexagon.HexagonX = position.x;
+        //newHexagon.HexagonY = position.y;
     }
 
     private void CurrentWordRemoveMostRecentLetter(string letter){
