@@ -151,6 +151,8 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
             LoadDictionary();
             ProcessGlowingHexagons();
             Loadicons(); 
+        } else {
+            MoveHexagonsIntoCanvasForSecondClient();
         }
         SetCameraZoomAndPosition();
     }
@@ -186,6 +188,15 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
             Team1Turn = false;
         } else{
             Team1Turn = true;
+        }
+    }
+
+    private void MoveHexagonsIntoCanvasForSecondClient() {
+        List<GameObject> secondClientsAllHexagons = FindObjectsOfType<GameObject>().Where(h => h.name.Contains("(clone)")).ToList();
+        foreach (GameObject hex in secondClientsAllHexagons)
+        {
+            Debug.Log("test");
+            hex.transform.SetParent(BoardTransform, false);
         }
     }
 
