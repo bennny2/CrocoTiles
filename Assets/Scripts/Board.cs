@@ -546,7 +546,7 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     public void HexagonPressed(Hexagon hex) {
-        if (PhotonNetwork.IsMasterClient) {
+        if (GameType == "Local" || PhotonNetwork.IsMasterClient && Team1Turn) {
             string hexState = hex.HexagonCurrentState;
             if (hexState == "neutral") {
                 AudioPressed.Play();
@@ -558,7 +558,8 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
                 hex.SetHexagonState(Neutral);
             } 
             ProcessGlowingHexagons();
-        } else {
+        } 
+        if (!PhotonNetwork.IsMasterClient) {
             PhotonView.RPC("RequestHexagonPressOnMaster", RpcTarget.MasterClient, hex.HexagonX, hex.HexagonY);
         }
     }
@@ -566,12 +567,25 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     [PunRPC]
     public void RequestHexagonPressOnMaster(float hexagonX, float hexagonY)
     {
-        
         Hexagon hex = _allHexagons.FirstOrDefault(h => h.HexagonX == hexagonX && h.HexagonY == hexagonY);
-        if (hex != null)
+        if (hex != null && !Team1Turn)
         {
-            HexagonPressed(hex);
+            HexagonPressedForSecondClient(hex);
         }
+    }
+
+    public void HexagonPressedForSecondClient(Hexagon hex) {
+        string hexState = hex.HexagonCurrentState;
+        if (hexState == "neutral") {
+            AudioPressed.Play();
+            CurrentWordAddNewLetter(hex.HexagonText.text);
+            hex.SetHexagonState(GetCurrentTeam());
+        } else if (hexState == "pressedTeam1" || hexState == "pressedTeam2") {
+            AudioUnPressed.Play();
+            CurrentWordRemoveMostRecentLetter(hex.HexagonText.text);
+            hex.SetHexagonState(Neutral);
+        } 
+        ProcessGlowingHexagons();
     }
 
     private bool IsHexagonPressed(Hexagon hex) {
