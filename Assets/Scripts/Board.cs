@@ -772,23 +772,21 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     private void ProcessGlowingHexagons() {
-        if(PhotonNetwork.IsMasterClient)
-        {
-        foreach (Hexagon hex in AllHexagons)
-        {
-            bool isTeam1Hex = hex.HexagonCurrentState == "territoryTeam1" || hex.HexagonCurrentState == "homeTeam1";
-            bool isTeam2Hex = hex.HexagonCurrentState == "territoryTeam2" || hex.HexagonCurrentState == "homeTeam2";
-            bool shouldGlow = (Team1Turn && isTeam1Hex) || (!Team1Turn && isTeam2Hex);
-            
-            if (hex.HexagonImage.material == null || hex.HexagonImage.material.shader.name != "Custom/GlowPulseShader")
+        if (PhotonNetwork.IsMasterClient) {
+            foreach (Hexagon hex in AllHexagons)
             {
-                hex.HexagonImage.material = new Material(Shader.Find("Custom/GlowPulseShader"));
-            }
+                bool isTeam1Hex = hex.HexagonCurrentState == "territoryTeam1" || hex.HexagonCurrentState == "homeTeam1";
+                bool isTeam2Hex = hex.HexagonCurrentState == "territoryTeam2" || hex.HexagonCurrentState == "homeTeam2";
+                bool shouldGlow = (Team1Turn && isTeam1Hex) || (!Team1Turn && isTeam2Hex);
+                
+                if (hex.HexagonImage.material == null || hex.HexagonImage.material.shader.name != "Custom/GlowPulseShader") {
+                    hex.HexagonImage.material = new Material(Shader.Find("Custom/GlowPulseShader"));
+                }
 
-            hex.HexagonImage.material.color = hex.HexagonImage.color;
-            hex.HexagonImage.material.SetFloat("_GlowStrength", shouldGlow ? 1.0f : 0.0f); 
-            hex.HexagonImage.material.SetFloat("_PulseSpeed", shouldGlow ? 3.0f : 0.0f); 
-        }
+                hex.HexagonImage.material.color = hex.HexagonImage.color;
+                hex.HexagonImage.material.SetFloat("_GlowStrength", shouldGlow ? 1.0f : 0.0f); 
+                hex.HexagonImage.material.SetFloat("_PulseSpeed", shouldGlow ? 3.0f : 0.0f); 
+           }
         }
     }
 
@@ -963,7 +961,7 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     public void SubmitButtonPressed() {
-        if (PhotonNetwork.IsMasterClient) {
+        if (GameType == "Local" || PhotonNetwork.IsMasterClient && Team1Turn) {
             if (Trie.Search(CurrentWordObjectOnScreen.CurrentWordText.text.ToLower()))
             {
                 ProcessValidWord();
@@ -972,14 +970,28 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
             {
                 ProcessInvalidWord();
             }
-        } else {
+        } 
+        if (!PhotonNetwork.IsMasterClient) {
             PhotonView.RPC("RequestSubmitButtonPressedOnMaster", RpcTarget.MasterClient);
         }
     }
 
     [PunRPC]
     public void RequestSubmitButtonPressedOnMaster() {
-        SubmitButtonPressed();
+        if (!Team1Turn) {
+            SubmitButtonPressedNoRestrictions();
+        }
+    }
+
+    public void SubmitButtonPressedNoRestrictions() {
+        if (Trie.Search(CurrentWordObjectOnScreen.CurrentWordText.text.ToLower()))
+            {
+                ProcessValidWord();
+            }
+            else
+            {
+                ProcessInvalidWord();
+            }
     }
 
     private void UpdateTeamIconPosition(Hexagon hex, string team) {
@@ -988,7 +1000,6 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
         teamIcon.transform.position = new Vector2(hex.HexagonX / 108f, hex.HexagonY / 108f);
     }
 
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) {
     }
 }
