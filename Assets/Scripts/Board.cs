@@ -333,12 +333,30 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     public void ClearWord() {
-        if (!string.IsNullOrWhiteSpace(CurrentWordObjectOnScreen.CurrentWordText.text) && (GameType == "Local" || ((Team1Turn && PhotonNetwork.IsMasterClient) || (!Team1Turn && !PhotonNetwork.IsMasterClient)))) {
+        if (!PhotonNetwork.IsMasterClient) {
+            PhotonView.RPC("RequestClearWordOnMaster", RpcTarget.MasterClient);
+        }
+        if (!string.IsNullOrWhiteSpace(CurrentWordObjectOnScreen.CurrentWordText.text) && 
+        (GameType == "Local" || (Team1Turn && PhotonNetwork.IsMasterClient) || (!Team1Turn && !PhotonNetwork.IsMasterClient))) {
             ResetWordState();
             AudioClearWord.Play();
             ClearPressedHexagonsInvalidWord();
             ProcessGlowingHexagons();
         }
+    }
+
+    [PunRPC]
+    public void RequestClearWordOnMaster() {
+        if (!Team1Turn) {
+            ClearWordIgnoreRestrictions();
+        }
+    }
+
+    public void ClearWordIgnoreRestrictions() {
+        ResetWordState();
+        AudioClearWord.Play();
+        ClearPressedHexagonsInvalidWord();
+        ProcessGlowingHexagons();
     }
 
     public void CreateHexagon(Vector3 position) {
