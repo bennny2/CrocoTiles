@@ -1,7 +1,8 @@
 using UnityEngine;
 using TMPro;
+using Photon.Pun;
 
-public class CurrentWord : MonoBehaviour
+public class CurrentWord : MonoBehaviour, IPunObservable
 {
     // Serialized Fields
 
@@ -31,6 +32,21 @@ public class CurrentWord : MonoBehaviour
         }
         else {
             Debug.LogError("TextMeshProUGUI component not initialized.", this);
+        }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            // Writing data: send the data of hexagon to the stream
+            string currentWordString = CurrentWordText.text;
+            stream.SendNext(currentWordString);
+        }
+        else
+        {
+            // Reading data: receive the data of hexagon from the stream
+            CurrentWordText.text = (string)stream.ReceiveNext();
         }
     }
 }
