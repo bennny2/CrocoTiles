@@ -704,8 +704,12 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     public void LoadMainMenu() {
-        ChooseSettingsNoise.Play();
-        StartCoroutine(LoadSceneCoroutine("MainMenuScene"));
+        if (GameType == "Online") {
+            PhotonNetwork.LeaveRoom();
+        } else {
+            ChooseSettingsNoise.Play();
+            StartCoroutine(LoadSceneCoroutine("MainMenuScene"));
+        }
     }
 
     private IEnumerator LoadSceneCoroutine(string scene) {
@@ -1015,5 +1019,10 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info) {
+    }
+
+    public override void OnLeftRoom() {
+        ChooseSettingsNoise.Play();
+        StartCoroutine(LoadSceneCoroutine("MainMenuScene"));
     }
 }
