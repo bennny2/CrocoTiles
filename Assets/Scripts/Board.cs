@@ -143,7 +143,7 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
 
     void Start() {
         Debug.Log(PhotonNetwork.IsMasterClient);
-        if (PhotonNetwork.IsMasterClient) {
+        if (PhotonNetwork.IsMasterClient || GameType != "Online") {
             InitializeColors();
             Letter.InitializeLetters();
             MakeAllHexagonsInvisible();
@@ -333,11 +333,11 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     public void ClearWord() {
-        if (!PhotonNetwork.IsMasterClient) {
+        if (GameType == "Online" && !PhotonNetwork.IsMasterClient) {
             PhotonView.RPC("RequestClearWordOnMaster", RpcTarget.MasterClient);
         }
         if (!string.IsNullOrWhiteSpace(CurrentWordObjectOnScreen.CurrentWordText.text) && 
-        (GameType == "Local" || (Team1Turn && PhotonNetwork.IsMasterClient) || (!Team1Turn && !PhotonNetwork.IsMasterClient))) {
+        (GameType != "Online" || (Team1Turn && PhotonNetwork.IsMasterClient) || (!Team1Turn && !PhotonNetwork.IsMasterClient))) {
             ResetWordState();
             AudioClearWord.Play();
             ClearPressedHexagonsInvalidWord();
@@ -360,7 +360,7 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     public void CreateHexagon(Vector3 position) {
-        if (GameType == "Local" || GameType == "CPU") {
+        if (GameType != "Online") {
             GameObject newHexagonObject = Instantiate(HexagonPrefab, BoardTransform);
             newHexagonObject.transform.SetLocalPositionAndRotation(position, Quaternion.identity);
             Hexagon newHexagon = newHexagonObject.GetComponent<Hexagon>();
@@ -546,7 +546,7 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     public void HexagonPressed(Hexagon hex) {
-        if (GameType == "Local" || PhotonNetwork.IsMasterClient && Team1Turn) {
+        if (GameType != "Online" || PhotonNetwork.IsMasterClient && Team1Turn) {
             string hexState = hex.HexagonCurrentState;
             if (hexState == "neutral") {
                 AudioPressed.Play();
@@ -559,7 +559,7 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
             } 
             ProcessGlowingHexagons();
         } 
-        if (!PhotonNetwork.IsMasterClient) {
+        if (GameType == "Online" && !PhotonNetwork.IsMasterClient) {
             PhotonView.RPC("RequestHexagonPressOnMaster", RpcTarget.MasterClient, hex.HexagonX, hex.HexagonY);
         }
     }
@@ -786,7 +786,7 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     private void ProcessGlowingHexagons() {
-        if (PhotonNetwork.IsMasterClient) {
+        if (GameType != "Online" || PhotonNetwork.IsMasterClient) {
             foreach (Hexagon hex in AllHexagons)
             {
                 bool isTeam1Hex = hex.HexagonCurrentState == "territoryTeam1" || hex.HexagonCurrentState == "homeTeam1";
@@ -975,7 +975,7 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     public void SubmitButtonPressed() {
-        if (GameType == "Local" || PhotonNetwork.IsMasterClient && Team1Turn) {
+        if (GameType != "Online" || PhotonNetwork.IsMasterClient && Team1Turn) {
             if (Trie.Search(CurrentWordObjectOnScreen.CurrentWordText.text.ToLower()))
             {
                 ProcessValidWord();
@@ -985,7 +985,7 @@ public class Board : MonoBehaviourPunCallbacks, IPunObservable
                 ProcessInvalidWord();
             }
         } 
-        if (!PhotonNetwork.IsMasterClient) {
+        if (GameType == "Online" && !PhotonNetwork.IsMasterClient) {
             PhotonView.RPC("RequestSubmitButtonPressedOnMaster", RpcTarget.MasterClient);
         }
     }
